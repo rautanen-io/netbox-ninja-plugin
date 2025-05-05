@@ -1,0 +1,3 @@
+# netbox-ninja-plugin
+
+Work in progress...

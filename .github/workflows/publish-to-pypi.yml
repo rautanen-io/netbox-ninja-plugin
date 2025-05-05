@@ -1,0 +1,47 @@
+name: Publish to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish (must match pyproject.toml)"
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+        id-token: write  # Required for OIDC token
+        contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python and Poetry
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry and Twine
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          python3 -m pip install --upgrade twine
+
+      - name: Show version
+        run: |
+          VERSION=$(poetry version --short)
+          echo "Detected version: $VERSION"
+
+          if [ -n "${{ github.event.inputs.version }}" ] && [ "${{ github.event.inputs.version }}" != "$VERSION" ]; then
+            echo "::error ::Input version (${{ github.event.inputs.version }}) does not match pyproject.toml ($VERSION)"
+            exit 1
+          fi
+
+      - name: Build package
+        run: poetry build
+
+      - name: Publish to PyPI (Using Trusted Publisher)
+        run: python3 -m twine upload --repository pypi dist/*

@@ -1,0 +1,57 @@
+name: Enforce Version Bump
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - '**'
+      - '!main'
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    if: >
+      (github.event_name == 'pull_request') ||
+      (github.event_name == 'push' && github.event.pull_request == null)
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0  # Important: fetch full history so git can push
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+  
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Get version from PR (pyproject.toml)
+        id: pr_version
+        run: |
+            PR_VERSION=$(poetry version --short)
+            echo "PR_VERSION=$PR_VERSION" >> $GITHUB_ENV
+            echo "Current PR version: $PR_VERSION"
+   
+      - name: Fetch version from main branch
+        run: |
+            git fetch origin main
+            git checkout origin/main -- pyproject.toml
+            
+            MAIN_VERSION=$(poetry version --short)
+            echo "MAIN_VERSION=$MAIN_VERSION" >> $GITHUB_ENV
+            echo "Main branch version: $MAIN_VERSION"
+
+      - name: Compare versions
+        run: |
+            if [ "$PR_VERSION" = "$MAIN_VERSION" ]; then
+            echo "::error ::Version must be bumped in PR (same as main)"
+            exit 1
+            else
+            echo "Version bump detected: $PR_VERSION ≠ $MAIN_VERSION"
+            fi

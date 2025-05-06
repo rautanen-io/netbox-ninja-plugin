@@ -1,0 +1,30 @@
+{
+  "name": "Python 3",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "..",
+    "args": {
+      "VARIANT": "3.11"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {},
+      "extensions": []
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/guiyomh/features/vim:0": {},
+    "ghcr.io/jungaretti/features/make:1": {}
+  },
+  "forwardPorts": [
+    8000
+  ],
+  "portsAttributes": {
+    "8000": {
+      "label": "Netbox",
+      "onAutoForward": "notify"
+    }
+  }
+}

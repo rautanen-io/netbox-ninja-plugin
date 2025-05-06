@@ -1,0 +1,51 @@
+{% extends 'generic/object.html' %}
+{% load tabs %}
+{% load ninja_tags %}
+
+{% block content %}
+
+<div>
+    {% for ninja_template in ninja_templates.all %}
+    <div class="card">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th> Output type</th>
+                    <th>Full screen</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ ninja_template|linkify:"name" }}</td>
+                    <td>{{ ninja_template.output_type }}</td>
+                    <td><a href="{{ object.get_absolute_url }}ninja?template_id={{ ninja_template.pk }}">Open</a></td>
+                    <td class="text-end d-print-none">
+                        {% if perms.netbox_ninja_plugin.change_ninjatemplate %}
+                        <a href="{% url 'plugins:netbox_ninja_plugin:ninjatemplate_edit' pk=ninja_template.pk %}?return_url={{ object.get_absolute_url }}"
+                            class="btn btn-warning lh-1" title="Edit">
+                            <i class="mdi mdi-pencil" aria-hidden="true"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Rendered</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><pre>{% render_object ninja_template target_object=object %}</pre></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

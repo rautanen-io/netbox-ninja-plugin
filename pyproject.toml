@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "netbox-ninja-plugin"
-version = "0.0.3"
+version = "0.1.0"
 description = "Dynamic configuration files and images from NetBox."
 authors = ["Veikko Pankakoski <veikko@rautanen.io>"]
 license = "MIT"
@@ -9,7 +9,6 @@ packages = [{ include = "netbox_ninja_plugin" }]
 homepage = "https://rautanen.io"
 repository = "https://github.com/rautanen-io/netbox-ninja-plugin"
 documentation = "https://github.com/rautanen-io/netbox-ninja-plugin"
-
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",
@@ -18,7 +17,42 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.11,<4.0"
+requests = "2.32.3"
+
+[tool.poetry.group.debug.dependencies]
+debugpy = "^1.8"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.5"
+black = "^25.1.0"
+isort = "^6.0.1"
+flake8 = "^7.2.0"
+autoflake = "^2.3.1"
+pre-commit = "^4.2.0"
+
+[tool.poetry.group.dev.dependencies]
+django = "5.1.8"
+jinja2 = "3.1.6"
+django-taggit = "6.1.0"
+django-tables2 = "2.7.5"
+djangorestframework = "3.16.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q"
+testpaths = ["tests"]

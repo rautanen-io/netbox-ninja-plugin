@@ -12,7 +12,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-        id-token: write  # Required for OIDC token
+        id-token: write
         contents: read
 
     steps:

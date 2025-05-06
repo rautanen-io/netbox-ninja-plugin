@@ -1,19 +1,15 @@
 name: Test
 
 on:
+  pull_request:
+
   push:
     branches:
-      - '*'
-  pull_request:
-    branches:
-      - '*'
+      - main
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    if: >
-      (github.event_name == 'pull_request') ||
-      (github.event_name == 'push' && github.event.pull_request == null)
 
     steps:
     - name: Checkout repository
@@ -31,8 +27,14 @@ jobs:
 
     - name: Install dependencies
       run: |
-        poetry install
+        poetry install --only test
+
+    - name: Run Linting
+      run: |
+        poetry run autoflake --quiet --check --ignore-init-module-imports --remove-all-unused-imports -r .
+        poetry run black --check --diff .
+        poetry run isort --check-only --diff .
 
     - name: Test plugin
       run: |
-        echo "no tests yet"
+        make test

@@ -1,0 +1,76 @@
+---
+volumes:
+  netbox-ninja-plugin:
+    driver: local
+
+services:
+  netbox:
+    container_name: netbox-ninja-netbox
+    image: ninja/netbox:${NETBOX_VERSION}-${PYTHON_VERSION}
+    profiles:
+    - netbox
+    depends_on:
+      - postgres
+      - redis
+    init: true
+    command:
+      - sh
+      - -c
+      - python manage.py migrate && python manage.py runserver 0.0.0.0:8000
+    ports:
+      - '3000:3000'
+      - '8000:8000'
+    volumes:
+      - ../:/opt/netbox_ninja_plugin
+      - ./configuration.py:/opt/netbox/netbox/netbox/configuration.py
+      - ./manage.py:/opt/netbox/netbox/manage.py
+    env_file: ./dev.env
+    tty: true
+    build: &build
+      context: ..
+      dockerfile: develop/Dockerfile
+      args:
+      - NETBOX_VERSION
+      - PYTHON_VERSION
+
+  worker:
+    container_name: netbox-ninja-worker
+    image: ninja/netbox:${NETBOX_VERSION}-${PYTHON_VERSION}
+    profiles:
+    - netbox
+    depends_on:
+      - netbox
+    init: true
+    command:
+      - sh
+      - -c
+      - python manage.py rqworker
+    volumes:
+      - ../:/opt/netbox_ninja_plugin
+      - ./configuration.py:/opt/netbox/netbox/netbox/configuration.py
+    env_file: ./dev.env
+    tty: true
+    build:
+      <<: *build
+
+  postgres:
+    container_name: netbox-ninja-postgres
+    image: postgres:16
+    profiles:
+    - netbox
+    env_file: dev.env
+    command: -c fsync=off
+    volumes:
+      - netbox-ninja-plugin:/var/lib/postgresql/data
+
+  redis:
+    container_name: netbox-ninja-redis
+    image: redis:7
+    profiles:
+    - netbox
+    init: true
+    command:
+      - sh
+      - -c
+      - redis-server --appendonly yes --requirepass $$REDIS_PASSWORD
+    env_file: ./dev.env

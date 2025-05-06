@@ -15,8 +15,6 @@ venv.bak/
 .idea/
 *.db
 *.sqlite3
-dist/
-build/
 
 # Poetry
 .poetry/
@@ -27,9 +25,6 @@ poetry.lock
 
 # VSCode
 .vscode/
-
-# Jupyter Notebooks
-.ipynb_checkpoints/
 
 # Pytest
 .cache

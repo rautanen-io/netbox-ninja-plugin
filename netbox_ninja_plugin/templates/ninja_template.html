@@ -1,0 +1,87 @@
+{% extends 'generic/object.html' %}
+{% load ninja_tags %}
+
+{% block content %}
+<div class="col col-md-6">
+    <div class="card">
+        <h5 class="card-header d-flex justify-content-between">
+            <span>Ninja Template</span>
+        </h5>
+        <table class="table table-hover attr-table">
+            <tr>
+                <td style="min-width:42px;">Name</td>
+                <td style="min-width:42px;">{{ object.name }}</td>
+            </tr>
+            <tr>
+                <td style="min-width:42px;">Output type</td>
+                <td style="min-width:42px;">{% badge object.output_type bg_color=object.get_output_type_color %}
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        {% include 'inc/panels/tags.html' %}
+    </div>
+    <div class="card">
+        <h5 class="card-header d-flex justify-content-between">
+            <span>Object Types</span>
+        </h5>
+        <table class="table table-hover attr-table">
+            {% for object_type in object.object_types.all %}
+            <tr>
+                <td style="min-width:42px;">
+                    {{ object_type }}</br>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td>---</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+<div class="col col-md-12">
+    <div class="card">
+        <h5 class="card-header d-flex justify-content-between">
+            <span>Code</span>
+        </h5>
+        <div class="card-body p-0 pt-0 overflow-auto">
+            <pre class="p-0 pt-0"><code class="language-jinja">{{ object.code }}</code></pre>
+        </div>
+    </div>
+</div>
+
+{% if not object.object_types.all.count %}
+
+<div class="col col-md-12">
+    <div class="card">
+        <h5 class="card-header d-flex justify-content-between">
+            <span>Rendered</span>
+        </h5>
+        <div class="card-body p-0 pt-0 overflow-auto">
+            {% render_object object target_object=object %}
+        </div>
+    </div>
+    <span>Open in <a href="{{ request.path }}render">full screen</a>.</span>
+
+</div>
+
+{% else %}
+
+<div class="col col-md-12">
+    <div class="card">
+        <h5 class="card-header d-flex justify-content-between">
+            <span>Rendered</span>
+        </h5>
+        <div class="card-body">
+            <span class="text-muted">See target objects to view rendered template when object types are set.</span>
+        </div>
+    </div>
+</div>
+
+
+{% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,4 @@
+<div class="card">
+  <h2 class="card-header">{{ card_header }}</h2>
+  {% htmx_table 'plugins:netbox_ninja_plugin:ninjatemplate_list' object_types=object_type.pk %}
+</div>

@@ -2,24 +2,17 @@ name: Enforce Version Bump
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
-  push:
-    branches:
-      - '**'
-      - '!main'
+
 jobs:
   check-version:
     runs-on: ubuntu-latest
-    if: >
-      (github.event_name == 'pull_request') ||
-      (github.event_name == 'push' && github.event.pull_request == null)
 
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-          fetch-depth: 0  # Important: fetch full history so git can push
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5

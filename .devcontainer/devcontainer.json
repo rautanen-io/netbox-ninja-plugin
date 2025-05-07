@@ -10,7 +10,9 @@
   "customizations": {
     "vscode": {
       "settings": {},
-      "extensions": []
+      "extensions": [
+        "samuelcolvin.jinjahtml"
+      ]
     }
   },
   "features": {

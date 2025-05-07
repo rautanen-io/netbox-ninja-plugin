@@ -1,0 +1,21 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.2 Chrome/134.0.6998.178 Electron/35.1.2 Safari/537.36" version="26.2.2">
+  <diagram name="Page-1" id="nSQkXgtPt4yLN-CesYIH">
+    <mxGraphModel dx="803" dy="932" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="region-{{ target_object.pk }}" value="{{ target_object.name }}" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="{{ 270 + (sites.filter(region_id=target_object.pk)|length - 1) / 2 * 200 }}" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        {%- for site in sites.filter(region_id=target_object.pk) %}
+        <mxCell id="site-{{ site.pk }}" value="{{ site.name }}" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="{{ 270 + loop.index0 * 200 }}" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="line-{{ site.pk }}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="region-{{ target_object.pk }}" target="site-{{ site.pk }}">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        {%- endfor %}
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

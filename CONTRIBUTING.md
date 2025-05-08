@@ -18,6 +18,14 @@ Thank you for your interest in contributing to the Ninja Netbox Plugin! This doc
 
 ### Initial Setup
 
+The quickest way to get started is using GitHub Codespaces:
+
+1. Click the "Code" button on the repository and select "Create codespace on main"
+2. Once your Codespace is ready, run `make demo_environment` in the terminal
+3. Access the development environment at http://localhost:8000 with credentials `admin/admin`
+
+Alternatively, you can set up locally:
+
 1. Clone the repository:
 ```bash
 git clone https://github.com/rautanen-io/netbox-ninja-plugin.git

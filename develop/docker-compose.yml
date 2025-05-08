@@ -21,14 +21,14 @@ services:
       - '3000:3000'
       - '8000:8000'
     volumes:
-      - ../:/opt/netbox_ninja_plugin
-      - ./configuration.py:/opt/netbox/netbox/netbox/configuration.py
-      - ./manage.py:/opt/netbox/netbox/manage.py
-    env_file: ./dev.env
+      - ${PWD}/:/opt/netbox_ninja_plugin
+      - ${PWD}/develop/configuration.py:/opt/netbox/netbox/netbox/configuration.py
+      - ${PWD}/develop/manage.py:/opt/netbox/netbox/manage.py
+    env_file: ${PWD}/develop/dev.env
     tty: true
     build: &build
-      context: ..
-      dockerfile: develop/Dockerfile
+      context: ${PWD}
+      dockerfile: ${PWD}/develop/Dockerfile
       args:
       - NETBOX_VERSION
       - PYTHON_VERSION
@@ -46,9 +46,9 @@ services:
       - -c
       - python manage.py rqworker
     volumes:
-      - ../:/opt/netbox_ninja_plugin
-      - ./configuration.py:/opt/netbox/netbox/netbox/configuration.py
-    env_file: ./dev.env
+      - ${PWD}/:/opt/netbox_ninja_plugin
+      - ${PWD}/develop//configuration.py:/opt/netbox/netbox/netbox/configuration.py
+    env_file: ${PWD}/develop/dev.env
     tty: true
     build:
       <<: *build
@@ -73,4 +73,16 @@ services:
       - sh
       - -c
       - redis-server --appendonly yes --requirepass $$REDIS_PASSWORD
-    env_file: ./dev.env
+    env_file: ${PWD}/develop/dev.env
+
+  drawio_export_api:
+    container_name: drawio-export-api
+    image: hirvi0/drawio-export-api:v0.1.0
+    ports:
+      - "443:443"
+    environment:
+      PYTHONPATH: /app/src
+    env_file: drawio_export_api/local.env
+    volumes:
+      - ${PWD}/develop/drawio_export_api/certs/dev-fullchain.pem:/etc/nginx/certs/fullchain.pem
+      - ${PWD}/develop/drawio_export_api/certs/dev-privkey.pem:/etc/nginx/certs/privkey.pem

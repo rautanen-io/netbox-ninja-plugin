@@ -12,6 +12,7 @@ TEST_MODE = len(sys.argv) > 1 and sys.argv[1] == "test"
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 CHANGELOG_RETENTION = 7
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8000"]
 PLUGINS = ["netbox_ninja_plugin"]
 
 PLUGINS_CONFIG = {
@@ -27,7 +28,7 @@ PLUGINS_CONFIG = {
         "drawio_export_api": {
             "url": "https://drawio-export-api:443/svg",
             "token": "token1",
-            "pem_file_path": "/opt/netbox_ninja_plugin/develop/drawio_export_api.pem",
+            "pem_file_path": "/opt/netbox_ninja_plugin/develop/drawio_export_api/certs/dev-fullchain.pem",
             "verify_tls": True,
             "timeout": 60,
         },

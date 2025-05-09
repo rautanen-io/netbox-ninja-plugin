@@ -22,7 +22,7 @@ PLUGINS_CONFIG = {
             "ipam": ["prefix"],
         },
         "jinja_model_querysets": {
-            "dcim": ["device", "interface", "site", "region"],
+            "dcim": ["device", "interface", "site", "region", "cable"],
             "ipam": ["prefix"],
         },
         "drawio_export_api": {

@@ -16,6 +16,13 @@
 {%- set y_offset =  110 -%}
 {%- set device_width =  50 -%}
 {%- set device_height =  50 -%}
+{%- set label_width =  50 -%}
+{%- set label_height =  15 -%}
+{%- set label_y_spacing =  20 -%}
+{%- set label_style =  "whiteSpace=wrap;html=1;rounded=1;arcSize=50;fontSize=12;rotation=0;strokeColor=cyan;fillColor=none" -%}
+{%- set label_fontcolor =  "cyan" -%}
+{%- set cable_style = "edgeStyle=elbowEdgeStyle;elbow=horizontal;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;endArrow=none;endFill=0;jumpStyle=gap;strokeColor=cyan;" -%}
+{%- set cable_spacing =  15 -%}
 {%- set ns = namespace(devices_runtime = {}) -%}
 {%- set shape_style = "shape=image;verticalLabelPosition=top;verticalAlign=middle;imageAspect=0;aspect=fixed;image=data:image/svg+xml,PHN2ZyB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWw6c3BhY2U9InByZXNlcnZlIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAzMDAgMzAwIiBoZWlnaHQ9IjEwMCUiIHdpZHRoPSIxMDAlIj4mI3hhOyAgICA8c3R5bGUgdHlwZT0idGV4dC9jc3MiPi5CYWNrZ3JvdW5kIHsgZmlsbDogbm9uZTsgfSAuTGluZXMgeyBmaWxsOiByZ2IoNDcsIDE0MiwgMjM3KTsgfSA8L3N0eWxlPiYjeGE7ICAgIDxnIGlkPSJCYWNrZ3JvdW5kIj4mI3hhOyAgICAgICAgPHBhdGggZD0iTTMwMCwzMC4yNzFDMzAwLDEzLjU2NCAyODYuNDM2LDAgMjY5LjcyOSwwTDMwLjI3MSwwQzEzLjU2NCwwIDAsMTMuNTY0IDAsMzAuMjcxTDAsMjY5LjcyOUMwLDI4Ni40MzYgMTMuNTY0LDMwMCAzMC4yNzEsMzAwTDI2OS43MjksMzAwQzI4Ni40MzYsMzAwIDMwMCwyODYuNDM2IDMwMCwyNjkuNzI5TDMwMCwzMC4yNzFaIiBjbGFzcz0iQmFja2dyb3VuZCIvPiYjeGE7ICAgICAgICA8cGF0aCBkPSJNMzAwLDMwLjI3MUMzMDAsMTMuNTY0IDI4Ni40MzYsMCAyNjkuNzI5LDBMMzAuMjcxLDBDMTMuNTY0LDAgMCwxMy41NjQgMCwzMC4yNzFMMCwyNjkuNzI5QzAsMjg2LjQzNiAxMy41NjQsMzAwIDMwLjI3MSwzMDBMMjY5LjcyOSwzMDBDMjg2LjQzNiwzMDAgMzAwLDI4Ni40MzYgMzAwLDI2OS43MjlMMzAwLDMwLjI3MVpNMjg0LDMwLjI3MUwyODQsMjY5LjcyOUMyODQsMjc3LjYwNiAyNzcuNjA2LDI4NCAyNjkuNzI5LDI4NEMyNjkuNzI5LDI4NCAzMC4yNzEsMjg0IDMwLjI3MSwyODRDMjIuMzk0LDI4NCAxNiwyNzcuNjA2IDE2LDI2OS43MjlMMTYsMzAuMjcxQzE2LDIyLjM5NCAyMi4zOTQsMTYgMzAuMjcxLDE2TDI2OS43MjksMTZDMjc3LjYwNiwxNiAyODQsMjIuMzk0IDI4NCwzMC4yNzFaIiBjbGFzcz0iTGluZXMiLz4mI3hhOyAgICAgICAgPGcgdHJhbnNmb3JtPSJtYXRyaXgoMC43NzkzMTUsLTAuNzc5MzE1LDAuNzc5MzE1LDAuNzc5MzE1LC00OC40MTY1LDE0OS45MTkpIj4mI3hhOyAgICAgICAgICAgIDxwYXRoIGQ9Ik0xMzguNDU4LDE1Mi4yNzNMMTM4LjQ1OCwyMDIuMjY5TDE1OC45MTUsMTgxLjgxNEwxNTguODQ2LDIxMy4xOEwxMjcuMzQ2LDI0NC42OEw5NS45MTIsMjEzLjI0NUw5NS45MTIsMTgxLjc2OUwxMTYuNDMsMjAyLjI4N0wxMTYuNDMsMTUyLjQxNUwxMzguNDU4LDE1Mi4yNzNaTTE5NC40OTEsMTE2LjQzTDI0NC4zNjQsMTE2LjQzTDI0NC41MDUsMTM4LjQ1OEwxOTQuNTA5LDEzOC40NThMMjE0Ljk2NCwxNTguOTE1TDE4My41OTksMTU4Ljg0NkwxNTIuMDk5LDEyNy4zNDZMMTgzLjUzMyw5NS45MTJMMjE1LjAwOSw5NS45MTJMMTk0LjQ5MSwxMTYuNDNaTTcwLjk2NywxNTguOTE1TDM5LjQ5LDE1OC45MTVMNjAuMDA5LDEzOC4zOTdMMTAuMTM2LDEzOC4zOTdMOS45OTQsMTE2LjM2OUw1OS45OSwxMTYuMzY5TDM5LjUzNiw5NS45MTJMNzAuOTAxLDk1Ljk4MUwxMDIuNDAxLDEyNy40ODFMNzAuOTY3LDE1OC45MTVaTTExNi4zNjksMTAyLjQzNEwxMTYuMzY5LDUyLjQzOEw5NS45MTIsNzIuODkzTDk1Ljk4MSw0MS41MjdMMTI3LjQ4MSwxMC4wMjhMMTU4LjkxNSw0MS40NjJMMTU4LjkxNSw3Mi45MzhMMTM4LjM5Nyw1Mi40MkwxMzguMzk3LDEwMi4yOTJMMTE2LjM2OSwxMDIuNDM0WiIgY2xhc3M9IkxpbmVzIi8+JiN4YTsgICAgICAgIDwvZz4mI3hhOyAgICA8L2c+JiN4YTs8L3N2Zz4=;html=1;labelPosition=center;align=middle;spacing=7;fontSize=22;" %}
 {%- set shape_fontcolor =  "#547fca" -%}
@@ -28,9 +35,6 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="title-{{ target_object.pk }}" value="&lt;a href=&quot;{{ target_object.get_absolute_url() }}&quot; style=&quot;color: {{ title_fontcolor }};&quot;&gt;{{ target_object.name }}:&lt;/a&gt;" style="{{ title_style }}" vertex="1" parent="1">
-          <mxGeometry x="320" y="360" width="260" height="30" as="geometry" />
-        </mxCell>
         <!-- 
             Devices in Diagram_level 0
             ==========================
@@ -53,6 +57,50 @@
           <mxCell id="device-{{ device.id }}" value="&lt;a href=&quot;{{ base_url}}{{ device.get_absolute_url() }}&quot; style=&quot;color: {{ shape_fontcolor }};&quot;&gt;{{ device.name }}&lt;/a&gt;" style="{{ shape_style }}" vertex="1" parent="1">
             <mxGeometry x="{{ device_x }}" y="{{ device_y }}" width="{{ device_width }}" height="{{ device_height }}" as="geometry" />
           </mxCell>
+          <!-- Labels for links for {{ device.name }} -->
+          {%- for cable in cables if cable.b_terminations[0].device.name == device.name %}
+          {%-   set offset = (loop.index0 - (loop.length - 1) / 2.0) * label_y_spacing %}
+          {%-   set labelY = device_y + device_height / 2.0 + offset - label_height/2 %}
+          {%-   set labelA_X = device_x - (x_offset/2) %}
+          <mxCell id="int_{{ cable.b_terminations[0].device }}_{{ cable.b_terminations[0] }}" value="&lt;a href=&quot;{{ base_url}}{{ cable.b_terminations[0].get_absolute_url() }}&quot; style=&quot;color: {{ label_fontcolor }};&quot;&gt;{{ cable.b_terminations[0]| replace("GigabitEthernet", "Gi") }}&lt;/a&gt;" style="{{ label_style }}" vertex="1" parent="1">
+            <mxGeometry x="{{ device_x - label_width - 10 }}" y="{{ labelY }}" width="{{ label_width }}" height="{{ label_height }}" as="geometry"/>
+          </mxCell>
+          <mxCell id="int_{{ cable.a_terminations[0].device }}_{{ cable.a_terminations[0] }}" value="&lt;a href=&quot;{{ base_url}}{{ cable.a_terminations[0].get_absolute_url() }}&quot; style=&quot;color: {{ label_fontcolor }};&quot;&gt;{{ cable.a_terminations[0]| replace("GigabitEthernet", "Gi") }}&lt;/a&gt;" style="{{ label_style }}" vertex="1" parent="1">
+            <mxGeometry x="{{ labelA_X }}" y="{{ labelY }}" width="{{ label_width }}" height="{{ label_height }}" as="geometry"/>
+          </mxCell>
+          <!-- Link connectors  -->
+          {%-   set ns2 = namespace(deviceA_lvl0_index = 0) %}
+          {%-   set deviceA_name = cable.a_terminations[0].device.name %}
+          {%-   set lvl0_devices = devices 
+              | selectattr("cf.diagram_level", "equalto", 0) 
+              | selectattr("site.name", "equalto", target_object.name) 
+              | list 
+          %}
+          {%-   for device in lvl0_devices %}
+          {%-     if device.name == deviceA_name %}
+          {%        set ns2.deviceA_lvl0_index = loop.index %}
+          {%-     endif %}
+          {%-   endfor %}
+          {%-   set spacingX = labelA_X - (ns.devices_runtime[deviceA_name].x + device_width) %}
+          {%-   set midX = (ns.devices_runtime[deviceA_name].x + device_width + labelA_X)/2 %}
+          {%-   set connX =  midX + (ns2.deviceA_lvl0_index - ((lvl0_devices|length)/2)) * cable_spacing %}
+          {%-   set connXbu =  ns.devices_runtime[deviceA_name].x + device_width + spacingX/2 + cable_spacing * ns2.deviceA_lvl0_index %}
+          {%-   set connY = labelY %}
+          <mxCell id="{{ device.name }}_int_{{ cable.a_terminations[0] }}_2_{{ cable.a_terminations[0].device.name }}" style="{{ cable_style }}" edge="1" parent="1" source="device-{{ cable.a_terminations[0].device.id }}" target="int_{{ cable.a_terminations[0].device.name }}_{{ cable.a_terminations[0] }}">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint as="targetPoint"/>
+              <Array as="points">
+                <mxPoint x="{{ connX }}" y="{{ connY }}"/>
+              </Array>
+            </mxGeometry>
+          </mxCell>
+          <mxCell id="{{ device.name }}_int_{{ cable.a_terminations[0] }}_2_{{ cable.b_terminations[0] }}" style="{{ cable_style }}" edge="1" parent="1" source="int_{{ cable.a_terminations[0].device.name }}_{{ cable.a_terminations[0] }}" target="int_{{ cable.b_terminations[0].device.name }}_{{ cable.b_terminations[0] }}">
+            <mxGeometry relative="1" as="geometry"></mxGeometry>
+          </mxCell>
+          <mxCell id="{{ device.name }}_int_{{ cable.b_terminations[0] }}_2_{{ cable.b_terminations[0].device.name }}" style="{{ cable_style }}" edge="1" parent="1" source="int_{{ cable.b_terminations[0].device.name }}_{{ cable.b_terminations[0] }}" target="device-{{ device.id }}">
+            <mxGeometry relative="1" as="geometry"></mxGeometry>
+          </mxCell>
+          {%- endfor %}
         {%- endfor %}
       </root>
     </mxGraphModel>

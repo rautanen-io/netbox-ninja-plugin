@@ -8,7 +8,10 @@ from django.db.models import Model
 from netbox.plugins import get_plugin_config
 
 from netbox_ninja_plugin import config
-from netbox_ninja_plugin.helpers import get_jinja_model_object_types
+from netbox_ninja_plugin.helpers import (
+    get_jinja_model_object_types,
+    replace_whitespace_with_underscores,
+)
 
 
 class NinjaTemplateMixin:
@@ -33,7 +36,9 @@ class NinjaTemplateMixin:
         for model in jinja_models:
             data = model.objects.all()
             # pylint: disable=protected-access
-            key = str(model._meta.verbose_name_plural)
+            key = replace_whitespace_with_underscores(
+                str(model._meta.verbose_name_plural)
+            )
             context[key] = data
 
         return context

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Dict, List, Type, cast
 
 from django.contrib.contenttypes.models import ContentType
@@ -73,7 +74,9 @@ def get_jinja_model_plural_names() -> List[str]:
     jinja_models = get_jinja_model_object_types()
     for model in jinja_models:
         # pylint: disable=protected-access
-        object_names.append(str(model._meta.verbose_name_plural))
+        object_names.append(
+            replace_whitespace_with_underscores(str(model._meta.verbose_name_plural))
+        )
     return object_names
 
 
@@ -119,3 +122,15 @@ def get_jinja_model_object_types() -> List[Type[Model]]:
     """
     data = _get_jinja_model_querysets()
     return _get_object_types(data)
+
+
+def replace_whitespace_with_underscores(string: str) -> str:
+    """Replace whitespace with underscores in a string.
+
+    Args:
+        string: The string to replace whitespace with underscores in.
+
+    Returns:
+        str: The string with whitespace replaced with underscores.
+    """
+    return re.sub(r"\s+", "_", string)

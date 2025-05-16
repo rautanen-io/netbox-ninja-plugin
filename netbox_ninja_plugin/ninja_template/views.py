@@ -29,11 +29,13 @@ from netbox_ninja_plugin.ninja_template.tables import NinjaTemplateTable
 logger = logging.getLogger(__name__)
 
 
+@register_model_view(NinjaTemplate)
 class NinjaTemplateView(ObjectView):
     queryset = NinjaTemplate.objects.all()
     template_name = "ninja_template.html"
 
 
+@register_model_view(NinjaTemplate, name="render", path="render")
 class NinjaTemplateRenderView(ObjectView):
     queryset = NinjaTemplate.objects.all()
     template_name = "ninja_template.html"
@@ -54,15 +56,18 @@ class NinjaTemplateListView(ObjectListView):
     filterset_form = NinjaTemplateFilterForm
 
 
+@register_model_view(NinjaTemplate, "edit")
 class NinjaTemplateEditView(ObjectEditView):
     queryset = NinjaTemplate.objects.all()
     form = NinjaTemplateForm
 
 
+@register_model_view(NinjaTemplate, "delete")
 class NinjaTemplateDeleteView(ObjectDeleteView):
     queryset = NinjaTemplate.objects.all()
 
 
+@register_model_view(NinjaTemplate, "changelog", kwargs={"model": NinjaTemplate})
 class NinjaTemplateChangeLogView(ObjectChangeLogView):
     base_template = "ninja_template.html"
 
@@ -120,6 +125,7 @@ for model in get_target_model_object_types():
             model_name = self.model_class._meta.model_name
             return redirect(reverse(f"{app_label}:{model_name}", args=[pk]))
 
+        # pylint: disable=arguments-differ
         def get(self, request: HttpRequest, pk: Any, **kwargs) -> HttpResponse:
             """
             Handle GET requests for Ninja template rendering.

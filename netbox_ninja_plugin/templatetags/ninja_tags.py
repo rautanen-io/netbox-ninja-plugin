@@ -5,4 +5,4 @@ register = template.Library()
 
 @register.simple_tag
 def render_object(obj, **context):
-    return obj.render(**context)
+    return obj.render(**context)[0]

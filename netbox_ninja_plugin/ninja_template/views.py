@@ -18,6 +18,7 @@ from netbox.views.generic import (
 from utilities.views import ViewTab, register_model_view
 
 from netbox_ninja_plugin.helpers import get_target_model_object_types
+from netbox_ninja_plugin.ninja_template.choices import NinjaTemplateOutputTypeChoices
 from netbox_ninja_plugin.ninja_template.filtersets import NinjaTemplateFilterSet
 from netbox_ninja_plugin.ninja_template.forms import (
     NinjaTemplateFilterForm,
@@ -38,10 +39,14 @@ class NinjaTemplateView(ObjectView):
 @register_model_view(NinjaTemplate, name="render", path="render")
 class NinjaTemplateRenderView(ObjectView):
     queryset = NinjaTemplate.objects.all()
-    template_name = "ninja_template.html"
 
     def get(self, request, **kwargs):
         instance = self.get_object(**kwargs)
+
+        if instance.output_type == NinjaTemplateOutputTypeChoices.JSON:
+            data, status = instance.render(**{"target_object": instance})
+            return HttpResponse(data, "application/json", 200 if status else 400)
+
         return render(
             request,
             "ninja_rendered.html",

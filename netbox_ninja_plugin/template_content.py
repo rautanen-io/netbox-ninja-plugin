@@ -3,16 +3,17 @@ from netbox.plugins import PluginTemplateExtension
 
 from netbox_ninja_plugin.helpers import get_target_model_fully_qualified_names
 
+template_extensions = []
 
-# pylint: disable=abstract-method
-class NinjaPluginCard(PluginTemplateExtension):
-    """A template extension that adds a card to the right side of object detail pages.
+for target_model in get_target_model_fully_qualified_names():
+    # pylint: disable=abstract-method
+    class NinjaPluginCard(PluginTemplateExtension):
+        """A template extension that adds a card to the right side of object detail pages.
 
-    This card displays Ninja templates related to the current object. The card is added
-    to all pages of models specified in the plugin configuration.
-    """
+        This card displays Ninja templates related to the current object. The card is added
+        to all pages of models specified in the plugin configuration.
+        """
 
-    for target_model in get_target_model_fully_qualified_names():
         # Using model and not models to support older Netbox versions.
         model = target_model
 
@@ -35,7 +36,9 @@ class NinjaPluginCard(PluginTemplateExtension):
                 },
             )
 
+    NinjaPluginCard.__name__ = (
+        "NinjaPluginCard"
+        + f"{''.join(part.capitalize() for part in target_model.strip().split('.'))}"
+    )
 
-template_extensions = [
-    NinjaPluginCard,
-]
+    template_extensions.append(NinjaPluginCard)

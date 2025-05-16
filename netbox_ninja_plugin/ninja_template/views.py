@@ -18,6 +18,7 @@ from netbox.views.generic import (
 from utilities.views import ViewTab, register_model_view
 
 from netbox_ninja_plugin.helpers import get_target_model_object_types
+from netbox_ninja_plugin.ninja_template.choices import NinjaTemplateOutputTypeChoices
 from netbox_ninja_plugin.ninja_template.filtersets import NinjaTemplateFilterSet
 from netbox_ninja_plugin.ninja_template.forms import (
     NinjaTemplateFilterForm,
@@ -29,17 +30,23 @@ from netbox_ninja_plugin.ninja_template.tables import NinjaTemplateTable
 logger = logging.getLogger(__name__)
 
 
+@register_model_view(NinjaTemplate)
 class NinjaTemplateView(ObjectView):
     queryset = NinjaTemplate.objects.all()
     template_name = "ninja_template.html"
 
 
+@register_model_view(NinjaTemplate, name="render", path="render")
 class NinjaTemplateRenderView(ObjectView):
     queryset = NinjaTemplate.objects.all()
-    template_name = "ninja_template.html"
 
     def get(self, request, **kwargs):
         instance = self.get_object(**kwargs)
+
+        if instance.output_type == NinjaTemplateOutputTypeChoices.JSON:
+            data, status = instance.render(**{"target_object": instance})
+            return HttpResponse(data, "application/json", 200 if status else 400)
+
         return render(
             request,
             "ninja_rendered.html",
@@ -54,15 +61,18 @@ class NinjaTemplateListView(ObjectListView):
     filterset_form = NinjaTemplateFilterForm
 
 
+@register_model_view(NinjaTemplate, "edit")
 class NinjaTemplateEditView(ObjectEditView):
     queryset = NinjaTemplate.objects.all()
     form = NinjaTemplateForm
 
 
+@register_model_view(NinjaTemplate, "delete")
 class NinjaTemplateDeleteView(ObjectDeleteView):
     queryset = NinjaTemplate.objects.all()
 
 
+@register_model_view(NinjaTemplate, "changelog", kwargs={"model": NinjaTemplate})
 class NinjaTemplateChangeLogView(ObjectChangeLogView):
     base_template = "ninja_template.html"
 
@@ -120,6 +130,7 @@ for model in get_target_model_object_types():
             model_name = self.model_class._meta.model_name
             return redirect(reverse(f"{app_label}:{model_name}", args=[pk]))
 
+        # pylint: disable=arguments-differ
         def get(self, request: HttpRequest, pk: Any, **kwargs) -> HttpResponse:
             """
             Handle GET requests for Ninja template rendering.

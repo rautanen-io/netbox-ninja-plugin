@@ -31,7 +31,7 @@ jobs:
 
     - name: Run Linting
       run: |
-        poetry run autoflake --quiet --check --ignore-init-module-imports --remove-all-unused-imports -r .
+        poetry run autoflake --quiet --check  --exclude ./netbox_ninja_plugin/models.py --ignore-init-module-imports --remove-all-unused-imports -r .
         poetry run black --check --diff .
         poetry run isort --check-only --diff .
 

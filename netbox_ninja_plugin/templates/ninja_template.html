@@ -51,9 +51,7 @@
         </div>
     </div>
 </div>
-
 {% if not object.object_types.all.count %}
-
 <div class="col col-md-12">
     <div class="card">
         <h5 class="card-header d-flex justify-content-between">
@@ -63,12 +61,9 @@
             {% render_object object target_object=object %}
         </div>
     </div>
-    <span>Open in <a href="{{ request.path }}render">full screen</a>.</span>
-
+    <span>View in <a href="{% url 'plugins:netbox_ninja_plugin:ninjatemplate_api' pk=object.pk %}?template={{ object.pk }}">API</a> .</span>
 </div>
-
 {% else %}
-
 <div class="col col-md-12">
     <div class="card">
         <h5 class="card-header d-flex justify-content-between">
@@ -79,9 +74,5 @@
         </div>
     </div>
 </div>
-
-
 {% endif %}
-
-
 {% endblock %}

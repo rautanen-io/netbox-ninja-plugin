@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import json
 import logging
-from typing import Any, Optional, Union
+from typing import Any, Optional, Tuple, Union
 
 from django.db.models import CharField, ManyToManyField, TextField
 from django.urls import reverse
@@ -53,15 +54,16 @@ class NinjaTemplate(NinjaTemplateMixin, NetBoxModel):
         # pylint: disable=no-member
         return NinjaTemplateOutputTypeChoices.colors.get(self.output_type)
 
-    def render(self, **context: Any) -> Union[str, SafeString]:
+    def render(self, **context: Any) -> Tuple[Union[str, SafeString], bool]:
         """Render the template with the given context.
 
         Args:
             **context: Additional context variables to use in template rendering.
 
         Returns:
-            Union[str, SafeString]: The rendered template output. For draw.io templates,
-                returns a safe HTML string. If rendering fails, returns an error message.
+            Tuple[Union[str, SafeString], bool]: The rendered template output. For draw.io templates,
+                returns a safe HTML string. If rendering fails, returns an error message. Also boolean
+                is returned. False means there was an error, True means no errors.
 
         Raises:
             TemplateSyntaxError: If there's a syntax error in the template
@@ -73,31 +75,38 @@ class NinjaTemplate(NinjaTemplateMixin, NetBoxModel):
 
         try:
             output = render_jinja2(self.code, context)
+            if self.output_type == NinjaTemplateOutputTypeChoices.JSON:
+
+                try:
+                    json.loads(output)
+                except (json.JSONDecodeError, TypeError) as err:
+                    return f"JSON validation error: {err}", False
+
             output = output.replace("\r\n", "\n")
             if self.output_type == NinjaTemplateOutputTypeChoices.DRAW_IO:
-                return mark_safe(self.drawio_export_api_client(output))
-            return output
+                return mark_safe(self.drawio_export_api_client(output)), True
+            return output, True
 
         except TemplateSyntaxError as err:
             error_msg = f"Template syntax error in '{self.name}': {str(err)}"
             logger.error(error_msg)
-            return f"Template Error: {error_msg}"
+            return f"Template Error: {error_msg}", False
 
         except UndefinedError as err:
             error_msg = f"Undefined variable in template '{self.name}': {str(err)}"
             logger.error(error_msg)
-            return f"Template Error: {error_msg}"
+            return f"Template Error: {error_msg}", False
 
         except TemplateError as err:
             error_msg = f"Template error in '{self.name}': {str(err)}"
             logger.error(error_msg)
-            return f"Template Error: {error_msg}"
+            return f"Template Error: {error_msg}", False
 
         # pylint: disable=broad-exception-caught
         except Exception as err:
             error_msg = f"Unexpected error rendering template '{self.name}': {str(err)}"
             logger.exception(error_msg)
-            return f"Error: {error_msg}"
+            return f"Error: {error_msg}", False
 
     def __str__(self) -> str:
         """String representation of the template.
@@ -119,3 +128,5 @@ class NinjaTemplate(NinjaTemplateMixin, NetBoxModel):
         """Meta options for the NinjaTemplate model."""
 
         ordering = ["name"]
+        verbose_name = "ninja template"
+        verbose_name_plural = "ninja templates"

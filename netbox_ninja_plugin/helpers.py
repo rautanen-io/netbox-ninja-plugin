@@ -4,7 +4,7 @@ import logging
 import re
 from typing import Dict, List, Type, cast
 
-from django.contrib.contenttypes.models import ContentType
+from core.models import ObjectType
 from django.db.models import Model
 from django.db.utils import ProgrammingError
 from netbox.plugins import get_plugin_config
@@ -93,14 +93,14 @@ def _get_object_types(data: Dict[str, List[str]]) -> List[Type[Model]]:
     for app_label, model_names in data.items():
         for model_name in model_names:
             try:
-                ct = ContentType.objects.get(app_label=app_label, model=model_name)
+                ct = ObjectType.objects.get(app_label=app_label, model=model_name)
                 model_class = ct.model_class()
                 if model_class is not None:
                     classes.append(cast(Type[Model], model_class))
             # This is expected to happen when Netbox starts and tries to load models
             # that are yet not present in the database.
             except ProgrammingError:
-                logger.error("ContentType for %s.%s not found", app_label, model_name)
+                logger.error("ObjectType for %s.%s not found", app_label, model_name)
     return classes
 
 

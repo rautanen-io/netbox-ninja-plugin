@@ -3,7 +3,6 @@
 {% load ninja_tags %}
 
 {% block content %}
-
 <div>
     {% for ninja_template in ninja_templates.all %}
     <div class="card">
@@ -12,18 +11,18 @@
                 <tr>
                     <th>Name</th>
                     <th> Output type</th>
-                    <th>Full screen</th>
+                    <th>API</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td>{{ ninja_template|linkify:"name" }}</td>
-                    <td>{{ ninja_template.output_type }}</td>
-                    <td><a href="{{ object.get_absolute_url }}ninja?template_id={{ ninja_template.pk }}">Open</a></td>
+                    <td>{% badge ninja_template.output_type bg_color=ninja_template.get_output_type_color %}</td>
+                    <td><a href="{{ object.get_absolute_url }}ninja-api/?template={{ ninja_template.pk }}">Open</a></td>
                     <td class="text-end d-print-none">
                         {% if perms.netbox_ninja_plugin.change_ninjatemplate %}
-                        <a href="{% url 'plugins:netbox_ninja_plugin:ninjatemplate_edit' pk=ninja_template.pk %}?return_url={{ object.get_absolute_url }}"
+                        <a href="{% url 'plugins:netbox_ninja_plugin:ninjatemplate_edit' pk=ninja_template.pk %}?return_url={{ object.get_absolute_url }}ninja/"
                             class="btn btn-warning lh-1" title="Edit">
                             <i class="mdi mdi-pencil" aria-hidden="true"></i>
                         </a>
@@ -47,5 +46,4 @@
     </div>
     {% endfor %}
 </div>
-
 {% endblock %}

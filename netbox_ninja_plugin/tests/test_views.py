@@ -36,9 +36,10 @@ class TestNinjaTemplateViews(TestNinjaTemplateMixing):
         template = NinjaTemplate.objects.create(
             name="test", code="""Name of this template: {{ target_object.name }}"""
         )
-        response = self.get("ninjatemplate_render", template.pk)
+        url = f"{template.get_absolute_url()}ninja-api/?template={template.pk}"
+        response = self.client.get(url)
         self.assertEqual(response.status_code, HTTP_200_OK)
-        self.assertEqual(response.content, b"\nName of this template: test\n")
+        self.assertEqual(response.content, b"Name of this template: test")
 
     def test_ninja_template_target_object_render(self):
         site = Site.objects.create(name="site1")

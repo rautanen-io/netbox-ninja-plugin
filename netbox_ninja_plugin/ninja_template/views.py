@@ -2,12 +2,9 @@ import logging
 from typing import Any, Type
 
 from core.models import ObjectType
-from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
-from django.urls import reverse
+from django.http import Http404, HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, render
 from netbox.views.generic import (
     ObjectChangeLogView,
     ObjectDeleteView,
@@ -15,9 +12,12 @@ from netbox.views.generic import (
     ObjectListView,
     ObjectView,
 )
+from rest_framework.permissions import BasePermission, IsAuthenticated
+from rest_framework.views import APIView
 from utilities.views import ViewTab, register_model_view
 
 from netbox_ninja_plugin.helpers import get_target_model_object_types
+from netbox_ninja_plugin.ninja_template.choices import NinjaTemplateOutputTypeChoices
 from netbox_ninja_plugin.ninja_template.filtersets import NinjaTemplateFilterSet
 from netbox_ninja_plugin.ninja_template.forms import (
     NinjaTemplateFilterForm,
@@ -29,22 +29,10 @@ from netbox_ninja_plugin.ninja_template.tables import NinjaTemplateTable
 logger = logging.getLogger(__name__)
 
 
+@register_model_view(NinjaTemplate)
 class NinjaTemplateView(ObjectView):
     queryset = NinjaTemplate.objects.all()
     template_name = "ninja_template.html"
-
-
-class NinjaTemplateRenderView(ObjectView):
-    queryset = NinjaTemplate.objects.all()
-    template_name = "ninja_template.html"
-
-    def get(self, request, **kwargs):
-        instance = self.get_object(**kwargs)
-        return render(
-            request,
-            "ninja_rendered.html",
-            {"ninja_template": instance, "target_object": instance},
-        )
 
 
 class NinjaTemplateListView(ObjectListView):
@@ -54,72 +42,40 @@ class NinjaTemplateListView(ObjectListView):
     filterset_form = NinjaTemplateFilterForm
 
 
+@register_model_view(NinjaTemplate, "edit")
 class NinjaTemplateEditView(ObjectEditView):
     queryset = NinjaTemplate.objects.all()
     form = NinjaTemplateForm
 
 
+@register_model_view(NinjaTemplate, "delete")
 class NinjaTemplateDeleteView(ObjectDeleteView):
     queryset = NinjaTemplate.objects.all()
 
 
+@register_model_view(NinjaTemplate, "changelog", kwargs={"model": NinjaTemplate})
 class NinjaTemplateChangeLogView(ObjectChangeLogView):
     base_template = "ninja_template.html"
 
 
-for model in get_target_model_object_types():
+def _register_ninja_tab_view(netbox_model):
 
-    view_name = f"Ninja{model.__name__}View"
-
-    @register_model_view(model, name="ninjaview", path="ninja")
+    @register_model_view(netbox_model, name="ninjaview", path="ninja")
     class DynamicNinjaView(ObjectView):
         """
         Dynamic view for rendering Ninja templates for specific Netbox objects.
         This view is automatically created for each supported model type.
         """
 
-        queryset = model.objects.all()
+        queryset = netbox_model.objects.all()
         tab = ViewTab(
             label="Ninja",
             weight=10000,
         )
 
-        model_class: Type[models.Model] = model
+        model_class: Type[models.Model] = netbox_model
 
-        def _get_object_type(self) -> ObjectType:
-            """Get the ObjectType for the current model."""
-            # pylint: disable=protected-access
-            app_label = self.model_class._meta.app_label
-            model_name = self.model_class._meta.model_name
-            logger.debug(
-                "Getting ObjectType for model %s in app %s", model_name, app_label
-            )
-            return ObjectType.objects.get(model=model_name)
-
-        def _render_template(
-            self, request: HttpRequest, template_id: str, pk: Any, target_object
-        ) -> HttpResponse:
-            """Render a specific Ninja template for the object."""
-            try:
-                template_obj = NinjaTemplate.objects.get(pk=template_id)
-                return render(
-                    request,
-                    "ninja_rendered.html",
-                    {"ninja_template": template_obj, "target_object": target_object},
-                )
-            except ObjectDoesNotExist:
-                messages.error(
-                    request, f"Ninja Template with ID {template_id} not found"
-                )
-            except Exception as err:
-                messages.error(request, f"Error rendering template: {err}")
-                logger.exception("Error rendering template %s", template_id)
-
-            # pylint: disable=protected-access
-            app_label = self.model_class._meta.app_label
-            model_name = self.model_class._meta.model_name
-            return redirect(reverse(f"{app_label}:{model_name}", args=[pk]))
-
+        # pylint: disable=arguments-differ
         def get(self, request: HttpRequest, pk: Any, **kwargs) -> HttpResponse:
             """
             Handle GET requests for Ninja template rendering.
@@ -132,13 +88,9 @@ for model in get_target_model_object_types():
             Returns:
                 HttpResponse: Rendered template or redirect
             """
-            object_type = self._get_object_type()
+            object_type = ObjectType.objects.get_for_model(self.model_class)
             ninja_templates = object_type.ninja_templates.all()
-
             target_object = self.model_class.objects.get(pk=pk)
-            template_id = request.GET.get("template_id")
-            if template_id:
-                return self._render_template(request, template_id, pk, target_object)
 
             return render(
                 request,
@@ -150,4 +102,72 @@ for model in get_target_model_object_types():
                 },
             )
 
-    DynamicNinjaView.__name__ = view_name
+    DynamicNinjaView.__name__ = f"Ninja{netbox_model.__name__}View"
+
+
+def _get_read_permission_class(netbox_model):
+    class HasModelViewPermission(BasePermission):
+        def has_permission(self, request, view):
+            app_label = netbox_model._meta.app_label
+            model_name = netbox_model._meta.model_name
+            perm = f"{app_label}.view_{model_name}"
+            return request.user.has_perm(perm)
+
+    return HasModelViewPermission
+
+
+def _register_ninja_api_view(netbox_model):
+
+    permission_class = _get_read_permission_class(model)
+
+    @register_model_view(netbox_model, name="api", path="ninja-api")
+    class DynamicNinjaAPIView(APIView):
+        permission_classes = [IsAuthenticated, permission_class]
+
+        target_model = netbox_model
+
+        def get(self, request, pk):
+            template_id = request.GET.get("template")
+            template = get_object_or_404(NinjaTemplate, pk=template_id)
+
+            ninja_template_object_type = ObjectType.objects.get_for_model(NinjaTemplate)
+            target_model = get_object_or_404(self.target_model, pk=pk)
+            target_object_type = ObjectType.objects.get_for_model(target_model)
+            templates_object_types = template.object_types.all()
+
+            # Check that if the template doesn't have any object types, template
+            # can only be rendered to a NinjaTemplate object type:
+            unassigned_ninja_template = False
+            if (
+                not templates_object_types
+                and target_object_type == ninja_template_object_type
+                and str(pk) == str(template_id)
+            ):
+                unassigned_ninja_template = True
+
+            # Check that the selected template is applied to this object type:
+            if (
+                not unassigned_ninja_template
+                and target_object_type not in templates_object_types
+            ):
+                raise Http404(
+                    f"Selected template is not applied to {target_object_type}."
+                )
+
+            data, status = template.render(**{"target_object": target_model})
+            http_content_type = "text/plain"
+            if template.output_type == NinjaTemplateOutputTypeChoices.JSON:
+                http_content_type = "application/json"
+            elif template.output_type == NinjaTemplateOutputTypeChoices.DRAW_IO:
+                http_content_type = "image/svg+xml"
+
+            return HttpResponse(data, http_content_type, 200 if status else 400)
+
+    DynamicNinjaAPIView.__name__ = f"NinjaAPI{netbox_model.__name__}View"
+
+
+for model in get_target_model_object_types():
+    _register_ninja_tab_view(model)
+
+for model in get_target_model_object_types() + [NinjaTemplate]:
+    _register_ninja_api_view(model)

@@ -61,7 +61,7 @@
             {% render_object object target_object=object %}
         </div>
     </div>
-    <span>View in <a href="{% url 'plugins:netbox_ninja_plugin:ninjatemplate_api' pk=object.pk %}?template={{ object.pk }}">API</a> .</span>
+    <span>View in <a href="{% url 'plugins-api:netbox_ninja_plugin-api:ninjatemplate-render' pk=object.pk %}?app={{ object|app_label }}&model={{ object|model_name }}&pk={{ object.pk }}">API</a>.</span>
 </div>
 {% else %}
 <div class="col col-md-12">

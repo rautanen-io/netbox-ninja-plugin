@@ -36,7 +36,7 @@ class TestNinjaTemplateViews(TestNinjaTemplateMixing):
         template = NinjaTemplate.objects.create(
             name="test", code="""Name of this template: {{ target_object.name }}"""
         )
-        url = f"{template.get_absolute_url()}ninja-api/?template={template.pk}"
+        url = f"/api{template.get_absolute_url()}render/?app=netbox_ninja_plugin&model=ninjatemplate&pk={template.pk}"
         response = self.client.get(url)
         self.assertEqual(response.status_code, HTTP_200_OK)
         self.assertEqual(response.content, b"Name of this template: test")

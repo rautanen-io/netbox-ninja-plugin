@@ -19,7 +19,7 @@
                 <tr>
                     <td>{{ ninja_template|linkify:"name" }}</td>
                     <td>{% badge ninja_template.output_type bg_color=ninja_template.get_output_type_color %}</td>
-                    <td><a href="{{ object.get_absolute_url }}ninja-api/?template={{ ninja_template.pk }}">Open</a></td>
+                    <td> <a href="{% url 'plugins-api:netbox_ninja_plugin-api:ninjatemplate-render' pk=ninja_template.pk %}?app={{ object|app_label }}&model={{ object|model_name }}&pk={{ object.pk }}">Open</a></td>
                     <td class="text-end d-print-none">
                         {% if perms.netbox_ninja_plugin.change_ninjatemplate %}
                         <a href="{% url 'plugins:netbox_ninja_plugin:ninjatemplate_edit' pk=ninja_template.pk %}?return_url={{ object.get_absolute_url }}ninja/"

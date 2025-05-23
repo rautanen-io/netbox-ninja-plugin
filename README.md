@@ -10,7 +10,24 @@ A NetBox plugin for generating dynamic text files and images using Jinja2 templa
 
 Netbox Ninja Plugin enables dynamic content generation in NetBox through Jinja2 templates. It supports both text file generation and SVG image creation from draw.io XML templates, seamlessly integrating with NetBox's data model.
 
+```mermaid
+graph LR
+    DATA[Any data in Netbox] --> TEMPLATE[Ninja template]
+    TEMPLATE --> DRAWIO[Drawio file]
+    DRAWIO[Drawio file] --> SVG[SVG image]
+    TEMPLATE --> JSON[JSON file]
+    TEMPLATE --> TEXT[Generic text]
+```
+Output files can be seen via Netbox UI and accessed via API.
+
 > **Note**: This plugin is currently in beta. While it's functional, some features are still under development and the API may change in future releases.
+
+## Use cases
+Netbox Ninja Plugin can be used to generate **always up-to-date** outputs for many use cases including (but not limited to) following:
+- Network diagrams
+- Any other visualization of any Netbox data
+- Configuration files for others systems to fetch from Netbox 
+- Any other text based output for any purpose
 
 ## Key Features
 
@@ -19,6 +36,8 @@ Netbox Ninja Plugin enables dynamic content generation in NetBox through Jinja2 
 - Direct integration with NetBox's data model
 - REST API endpoints for template management
 - Support for object-specific template rendering
+  - Show output in Ninja tab in chosen Netbox object view (i.e. Site)
+  - Tempalate rendered per object (i.e for each Site)
 
 ## Requirements
 

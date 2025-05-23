@@ -17,6 +17,12 @@ graph LR
     DRAWIO[Drawio file] --> SVG[SVG image]
     TEMPLATE --> JSON[JSON file]
     TEMPLATE --> TEXT[Generic text]
+    SVG --> NBUI[Netbox UI]
+    JSON --> NBUI[Netbox UI]
+    TEXT --> NBUI[Netbox UI]
+    SVG --> API[Netbox API]
+    JSON --> API[Netbox API]
+    TEXT --> API[Netbox API]
 ```
 Output files can be seen via Netbox UI and accessed via API.
 

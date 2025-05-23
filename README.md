@@ -26,6 +26,8 @@ graph LR
 ```
 Output files can be seen via Netbox UI and accessed via API.
 
+See video introduction in [Youtube](https://youtu.be/yTFBYkSDgWY?si=YAkBmPFcv_doXWgH).
+
 > **Note**: This plugin is currently in beta. While it's functional, some features are still under development and the API may change in future releases.
 
 ## Use cases

@@ -18,7 +18,7 @@ Let's draw a simple picture with [draw.io](https://www.drawio.com):
 
 After saving the drawing, we'll get a draw.io format XML file. We can make the drawing dynamic by adding Netbox data and logic to it by using Jinja notation:
 
-```xml
+```jinja
 <mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.2 Chrome/134.0.6998.178 Electron/35.1.2 Safari/537.36" version="26.2.2">
   <diagram name="Page-1" id="nSQkXgtPt4yLN-CesYIH">
     <mxGraphModel dx="803" dy="932" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">

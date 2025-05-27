@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import xml.etree.ElementTree as ET
 from typing import Any, Dict, List
 
 import requests
@@ -43,6 +44,48 @@ class NinjaTemplateMixin:
 
         return context
 
+    def _add_svgdata_ids(self, svg_string):
+        namespaces = {
+            "svg": "http://www.w3.org/2000/svg",
+            "xlink": "http://www.w3.org/1999/xlink",
+        }
+        ET.register_namespace("", namespaces["svg"])
+        ET.register_namespace("xlink", namespaces["xlink"])
+
+        try:
+            root = ET.fromstring(svg_string)
+        except ET.ParseError as e:
+            return svg_string
+
+        for g_element in root.findall(
+            ".//svg:g[@data-cell-id]", namespaces={"svg": namespaces["svg"]}
+        ):
+            data_cell_id = g_element.get("data-cell-id")
+
+            if data_cell_id:
+                inner_g = ET.Element(f"{{{namespaces['svg']}}}g")
+                inner_g.set("id", f"cell-{data_cell_id}")
+
+                children_to_move = list(g_element)
+                for child in children_to_move:
+                    g_element.remove(child)
+                    inner_g.append(child)
+
+                g_element.append(inner_g)
+
+        svg_element_and_content_str = ET.tostring(
+            root, encoding="unicode", method="xml"
+        )
+
+        xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        doctype_str = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
+
+        final_transformed_svg_string = (
+            xml_declaration + doctype_str + svg_element_and_content_str
+        )
+
+        return final_transformed_svg_string
+
     def drawio_export_api_client(self, drawio_xml: str) -> str:
         """Convert a draw.io XML diagram to SVG using an external API.
 
@@ -73,4 +116,8 @@ class NinjaTemplateMixin:
             timeout=api_params["timeout"],
         )
 
-        return response.content.decode("utf-8")
+        xml_string_with_svg_data = self._add_svgdata_ids(
+            response.content.decode("utf-8")
+        )
+
+        return xml_string_with_svg_data

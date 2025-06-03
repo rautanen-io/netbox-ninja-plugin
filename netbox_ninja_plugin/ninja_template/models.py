@@ -9,8 +9,10 @@ from django.urls import reverse
 from django.utils.safestring import SafeString, mark_safe
 from jinja2 import TemplateError, TemplateSyntaxError, UndefinedError
 from netbox.models import NetBoxModel
+from netbox.plugins import get_plugin_config
 from utilities.jinja2 import render_jinja2
 
+from netbox_ninja_plugin import config
 from netbox_ninja_plugin.ninja_template.choices import NinjaTemplateOutputTypeChoices
 from netbox_ninja_plugin.ninja_template.logic import NinjaTemplateMixin
 
@@ -54,10 +56,13 @@ class NinjaTemplate(NinjaTemplateMixin, NetBoxModel):
         # pylint: disable=no-member
         return NinjaTemplateOutputTypeChoices.colors.get(self.output_type)
 
-    def render(self, **context: Any) -> Tuple[Union[str, SafeString], bool]:
+    def render(
+        self, frontend=False, **context: Any
+    ) -> Tuple[Union[str, SafeString], bool]:
         """Render the template with the given context.
 
         Args:
+            frontend: use frontend (JavaScript) to render Draw.io images.
             **context: Additional context variables to use in template rendering.
 
         Returns:
@@ -84,6 +89,17 @@ class NinjaTemplate(NinjaTemplateMixin, NetBoxModel):
 
             output = output.replace("\r\n", "\n")
             if self.output_type == NinjaTemplateOutputTypeChoices.DRAW_IO:
+                if frontend:
+                    return mark_safe(output), True
+
+                api_params = get_plugin_config(
+                    "netbox_ninja_plugin",
+                    "drawio_export_api",
+                    default=config.default_settings["drawio_export_api"],
+                )
+                if not api_params["enabled"]:
+                    return "<error>draw.io export API is not enabled.</error>", False
+
                 return mark_safe(self.drawio_export_api_client(output)), True
             return output, True
 

@@ -20,6 +20,7 @@ PLUGINS_CONFIG = {
             "ipam": ["prefix"],
         },
         "drawio_export_api": {
+            "enabled": True,
             "url": "https://drawio-export-api:443/svg",
             "token": "your-token",
             "pem_file_path": "/path/to/drawio_export_api.pem",
@@ -37,6 +38,7 @@ PLUGINS_CONFIG = {
 | `target_models` | Specifies which Netbox class views will have the Ninja tab. This determines where the template output will be displayed in the NetBox interface. |
 | `jinja_model_querysets` | Defines which Netbox object types can be used in the Ninja templates. These are the models that can be queried using Jinja2 syntax in your templates. |
 | `drawio_export_api.url` | The URL for the [drawio-export-api](https://github.com/rautanen-io/drawio-export-api) service. This is required for SVG image generation. |
+| `drawio_export_api.enabled` | Boolean to enable or disable Draw.io Export API integration. |
 | `drawio_export_api.token` | Bearer token used to authenticate to the draw.io API. This should be kept secure and not exposed in version control. |
 | `drawio_export_api.pem_file_path` | Path to the PEM file used to encrypt data between the plugin and draw.io API. Required when `verify_tls` is enabled. |
 | `drawio_export_api.verify_tls` | Whether to use TLS encryption for API communication. If set to `False`, the PEM file is not required. |
@@ -63,6 +65,7 @@ PLUGINS_CONFIG = {
             "dcim": ["device", "interface", "site", "region"],
         },
         "drawio_export_api": {
+            "enabled": True,
             "url": "http://localhost:8080/svg",
             "token": "dev-token",
             "verify_tls": False,
@@ -86,6 +89,7 @@ PLUGINS_CONFIG = {
             "ipam": ["prefix", "vrf", "vlan"],
         },
         "drawio_export_api": {
+            "enabled": True,
             "url": "https://drawio-export-api:443/svg",
             "token": "{{ env.DRAWIO_API_TOKEN }}",
             "pem_file_path": "/etc/netbox/drawio_export_api.pem",

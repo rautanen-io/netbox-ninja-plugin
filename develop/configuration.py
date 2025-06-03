@@ -26,6 +26,7 @@ PLUGINS_CONFIG = {
             "ipam": ["prefix"],
         },
         "drawio_export_api": {
+            "enabled": True,
             "url": "https://drawio-export-api:443/svg",
             "token": "token1",
             "pem_file_path": "/opt/netbox_ninja_plugin/develop/drawio_export_api/certs/dev-fullchain.pem",

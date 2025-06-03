@@ -35,6 +35,7 @@ class NinjaPluginConfig(PluginConfig):
             "ipam": ["prefix"],
         },
         "drawio_export_api": {
+            "enabled": False,
             "url": "https://drawio-export-api:443/svg",
             "token": "token1",
             "pem_file_path": "/opt/netbox_ninja_plugin/develop/fullchain.pem",

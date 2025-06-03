@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 
 import requests
 from django.db.models import Model
+from lxml import etree
 from netbox.plugins import get_plugin_config
 
 from netbox_ninja_plugin import config
@@ -43,6 +44,39 @@ class NinjaTemplateMixin:
 
         return context
 
+    def imitate_drawio_svgdata_plugin(self, svg_input: str) -> str:
+        """
+        This svg manipulation is needed by Grafana's Flow plugin.
+
+        Ideally it should be part of draw.io export API but currently
+        it's not supported:
+
+        More context:
+        https://grafana.com/grafana/plugins/andrewbmchugh-flow-panel/
+        https://github.com/rlespinasse/drawio-export/issues/139
+        https://github.com/jgraph/drawio/blob/dev/src/main/webapp/plugins/svgdata.js
+        https://github.com/jgraph/drawio/issues/3225#issuecomment-1336910173
+        """
+
+        parser = etree.XMLParser(remove_blank_text=True)
+        tree = etree.fromstring(svg_input.encode("utf-8"), parser)
+
+        for g_elem in tree.xpath(
+            ".//svg:g[@data-cell-id]", namespaces={"svg": "http://www.w3.org/2000/svg"}
+        ):
+            data_cell_id = g_elem.get("data-cell-id")
+            new_g = etree.Element(
+                "{http://www.w3.org/2000/svg}g", id=f"cell-{data_cell_id}"
+            )
+
+            for child in list(g_elem):
+                g_elem.remove(child)
+                new_g.append(child)
+
+            g_elem.append(new_g)
+
+        return etree.tostring(tree, pretty_print=True, encoding="unicode")
+
     def drawio_export_api_client(self, drawio_xml: str) -> str:
         """Convert a draw.io XML diagram to SVG using an external API.
 
@@ -73,4 +107,7 @@ class NinjaTemplateMixin:
             timeout=api_params["timeout"],
         )
 
-        return response.content.decode("utf-8")
+        svg = response.content.decode("utf-8")
+        svg_with_svgdata = self.imitate_drawio_svgdata_plugin(svg)
+
+        return svg_with_svgdata

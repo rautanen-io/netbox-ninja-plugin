@@ -34,7 +34,7 @@ See video introduction in [Youtube](https://youtu.be/yTFBYkSDgWY?si=YAkBmPFcv_do
 Netbox Ninja Plugin can be used to generate **always up-to-date** outputs for many use cases including (but not limited to) following:
 - Network diagrams
 - Any other visualization of any Netbox data
-- Configuration files for others systems to fetch from Netbox 
+- Configuration files for others systems to fetch from Netbox
 - Any other text based output for any purpose
 
 ## Key Features
@@ -50,7 +50,7 @@ Netbox Ninja Plugin can be used to generate **always up-to-date** outputs for ma
 ## Requirements
 
 - NetBox v4.2.7 or later
-- [drawio-export-api](https://github.com/rautanen-io/drawio-export-api) Docker container (optional, required for image generation)
+- [drawio-export-api](https://github.com/rautanen-io/drawio-export-api) Docker container. Optional, required for SVG images that need to be fetched through REST API.
 
 ## Quick Start
 
@@ -79,6 +79,7 @@ PLUGINS_CONFIG = {
             "ipam": ["prefix"],
         },
         "drawio_export_api": {
+            "enabled": True,
             "url": "https://drawio-export-api:443/svg",
             "token": "your-token",
             "pem_file_path": "/path/to/drawio_export_api.pem",

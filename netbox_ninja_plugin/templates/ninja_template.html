@@ -59,21 +59,20 @@
             <span>Rendered</span>
         </h5>
         <div class="card-body p-0 pt-0 overflow-auto">
+            {% if object.output_type == 'drawio' %}
             <div id="mxgraphContainer0"></div>
+            {% else %}
+            <pre>{% render_object object target_object=object %}</pre>
+            {% endif %}
         </div>
     </div>
     <span>View in <a href="{% url 'plugins-api:netbox_ninja_plugin-api:ninjatemplate-render' pk=object.pk %}?app={{ object|app_label }}&model={{ object|model_name }}&pk={{ object.pk }}">API</a>.</span>
 </div>
-<script>
-    window.NINJA_CONFIGS = [];
-    window.NINJA_CONFIGS.push({
-        viewerScriptUrl: "{% static 'netbox_ninja_plugin/js/viewer-static.min.js' %}",
-        xmlData: `{% filter escapejs %}{% render_object object frontend=True target_object=object %}{% endfilter %}`,
-        editUrl: "{% url 'plugins:netbox_ninja_plugin:ninjatemplate_edit' pk=object.pk %}?return_url={{ object.get_absolute_url }}",
-        mxgraphContainerId: "mxgraphContainer0"
-    });
-</script>
-<script src="{% static 'netbox_ninja_plugin/js/viewer-loader.js' %}"></script>
+    {% with ninja_templates=object|as_list %}
+        {% if object.output_type == 'drawio' %}
+            {% include "_drawio_script.html" %}
+        {% endif %}
+    {% endwith %}
 {% else %}
 <div class="col col-md-12">
     <div class="card">

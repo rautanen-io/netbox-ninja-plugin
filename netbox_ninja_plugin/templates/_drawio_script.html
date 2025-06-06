@@ -1,0 +1,18 @@
+{% load static %}
+{% load ninja_tags %}
+{% block content %}
+<script>
+    window.NINJA_CONFIGS = [];
+    {% for template in ninja_templates %}
+    {% if template.output_type == 'drawio' %}
+    window.NINJA_CONFIGS.push({
+        viewerScriptUrl: "{% static 'netbox_ninja_plugin/js/viewer-static.min.js' %}",
+        xmlData: `{% filter escapejs %}{% render_object template frontend=True target_object=object %}{% endfilter %}`,
+        editUrl: "{% url 'plugins:netbox_ninja_plugin:ninjatemplate_edit' pk=template.pk %}?return_url={{ object.get_absolute_url }}ninja/",
+        mxgraphContainerId: "mxgraphContainer{{ forloop.counter0 }}"
+    });
+    {% endif %}
+    {% endfor %}
+</script>
+<script src="{% static 'netbox_ninja_plugin/js/viewer-loader.js' %}"></script>
+{% endblock %}

@@ -43,7 +43,11 @@
             <tbody>
                 <tr>
                     <td>
+                        {% if ninja_template.output_type == 'drawio' %}
                         <div id="mxgraphContainer{{ forloop.counter0 }}"></div>
+                        {% else %}
+                        <pre>{% render_object ninja_template target_object=object %}</pre>
+                        {% endif %}
                     </td>
                 </tr>
             </tbody>
@@ -51,16 +55,7 @@
     </div>
     {% endfor %}
 </div>
-<script>
-    window.NINJA_CONFIGS = [];
-    {% for ninja_template in ninja_templates.all %}
-    window.NINJA_CONFIGS.push({
-        viewerScriptUrl: "{% static 'netbox_ninja_plugin/js/viewer-static.min.js' %}",
-        xmlData: `{% filter escapejs %}{% render_object ninja_template frontend=True target_object=object %}{% endfilter %}`,
-        editUrl: "{% url 'plugins:netbox_ninja_plugin:ninjatemplate_edit' pk=ninja_template.pk %}?return_url={{ object.get_absolute_url }}ninja/",
-        mxgraphContainerId: "mxgraphContainer{{ forloop.counter0 }}"
-    });
-    {% endfor %}
-</script>
-<script src="{% static 'netbox_ninja_plugin/js/viewer-loader.js' %}"></script>
+{% if ninja_templates.all|any_drawio %}
+    {% include "_drawio_script.html" %}
+{% endif %}
 {% endblock %}

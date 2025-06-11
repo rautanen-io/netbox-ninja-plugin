@@ -9,7 +9,11 @@ RUN set -x \
     && curl -sSLO https://github.com/netbox-community/netbox/archive/refs/tags/v${NETBOX_VERSION}.tar.gz \
     && tar xzf v${NETBOX_VERSION}.tar.gz \
     && mv -fv /opt/netbox-${NETBOX_VERSION} /opt/netbox \
-    && chown -cR netbox:root /opt/netbox/netbox/media \
+    && chown -cR netbox:root /opt/netbox/netbox/media
+
+COPY develop/base_requirements.txt /opt/netbox/
+RUN set -x \
+    && cd /opt \
     && pip install --no-cache-dir --upgrade pip wheel \
     && pip install --no-cache-dir poetry -r netbox/base_requirements.txt
 

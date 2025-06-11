@@ -21,7 +21,7 @@ class NinjaPluginConfig(PluginConfig):
     description = "Dynamic configuration files and images from NetBox."
     version = __version__
     min_version = "4.0.11"
-    max_version = "4.2.7"
+    max_version = "4.3.2"
     author = "rautanen.io"
     author_email = "veikko@rautanenyhtiot.fi"
     required_settings = []
@@ -52,9 +52,6 @@ class NinjaPluginConfig(PluginConfig):
         extensions and menu items.
         """
         from netbox_ninja_plugin.navigation import plugin_navigation
-        from netbox_ninja_plugin.template_content import template_extensions
-
-        register_template_extensions(template_extensions)
 
         for title, items in plugin_navigation.items():
             register_menu_items(title, items)

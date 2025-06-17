@@ -52,6 +52,14 @@ Netbox Ninja Plugin can be used to generate **always up-to-date** outputs for ma
 - NetBox v4.0.11 - v4.3.2
 - [drawio-export-api](https://github.com/rautanen-io/drawio-export-api) Docker container. Optional, required for SVG images that need to be fetched through REST API.
 
+## Test Ninja in Codespaces
+
+The quickest way to test Ninja is using GitHub Codespaces:
+
+1. Click the "Code" button on the repository and select "Create codespace on main"
+2. Once your Codespace is ready, run `make demo_environment` in the terminal
+3. Access the development environment at http://localhost:8000 with credentials admin/admin
+
 ## Quick Start
 
 1. Install the plugin:

@@ -70,7 +70,7 @@
 </div>
     {% with ninja_templates=object|as_list %}
         {% if object.output_type == 'drawio' %}
-            {% include "_drawio_script.html" %}
+            {% include "netbox_ninja_plugin/_drawio_script.html" %}
         {% endif %}
     {% endwith %}
 {% else %}

@@ -1,10 +1,6 @@
 from importlib import metadata
 
-from netbox.plugins import (
-    PluginConfig,
-    register_menu_items,
-    register_template_extensions,
-)
+from netbox.plugins import PluginConfig
 
 __version__ = metadata.version(__name__)
 
@@ -20,8 +16,8 @@ class NinjaPluginConfig(PluginConfig):
     verbose_name = "Netbox Ninja"
     description = "Dynamic configuration files and images from NetBox."
     version = __version__
-    min_version = "4.0.11"
-    max_version = "4.3.2"
+    min_version = "4.2.3"
+    max_version = "4.3.6"
     author = "rautanen.io"
     author_email = "veikko@rautanenyhtiot.fi"
     required_settings = []
@@ -42,19 +38,8 @@ class NinjaPluginConfig(PluginConfig):
             "verify_tls": True,
             "timeout": 60,
         },
+        "top_level_menu": False,
     }
-
-    # pylint: disable=import-outside-toplevel,unused-import
-    def ready(self) -> None:
-        """Initialize the plugin when it's loaded.
-
-        This method is called when the plugin is loaded. It registers the template
-        extensions and menu items.
-        """
-        from netbox_ninja_plugin.navigation import plugin_navigation
-
-        for title, items in plugin_navigation.items():
-            register_menu_items(title, items)
 
 
 config = NinjaPluginConfig  # pylint: disable=invalid-name

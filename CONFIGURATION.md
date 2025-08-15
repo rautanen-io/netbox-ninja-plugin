@@ -27,6 +27,7 @@ PLUGINS_CONFIG = {
             "verify_tls": True,
             "timeout": 60,
         },
+        "top_level_menu": False,
     }
 }
 ```
@@ -43,6 +44,7 @@ PLUGINS_CONFIG = {
 | `drawio_export_api.pem_file_path` | Path to the PEM file used to encrypt data between the plugin and draw.io API. Required when `verify_tls` is enabled. |
 | `drawio_export_api.verify_tls` | Whether to use TLS encryption for API communication. If set to `False`, the PEM file is not required. |
 | `drawio_export_api.timeout` | Maximum time (in seconds) the plugin will wait for the draw.io export API before closing the connection. |
+| `top_level_menu` | If `True`, the plugin is displayed in its own submenu as part of NetBox's navigation menu. If `False`, the plugin is displayed in NetBox's shared "Plugins" menu. |
 
 ## Security Considerations
 
@@ -71,6 +73,7 @@ PLUGINS_CONFIG = {
             "verify_tls": False,
             "timeout": 30,
         },
+        "top_level_menu": False,
     }
 }
 ```
@@ -96,6 +99,7 @@ PLUGINS_CONFIG = {
             "verify_tls": True,
             "timeout": 60,
         },
+        "top_level_menu": False,
     }
 }
 ```

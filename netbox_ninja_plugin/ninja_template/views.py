@@ -6,7 +6,6 @@ from django.db import models
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from netbox.views.generic import (
-    ObjectChangeLogView,
     ObjectDeleteView,
     ObjectEditView,
     ObjectListView,
@@ -29,7 +28,7 @@ logger = logging.getLogger(__name__)
 @register_model_view(NinjaTemplate)
 class NinjaTemplateView(ObjectView):
     queryset = NinjaTemplate.objects.all()
-    template_name = "ninja_template.html"
+    template_name = "netbox_ninja_plugin/ninjatemplate.html"
 
 
 class NinjaTemplateListView(ObjectListView):
@@ -48,11 +47,6 @@ class NinjaTemplateEditView(ObjectEditView):
 @register_model_view(NinjaTemplate, "delete")
 class NinjaTemplateDeleteView(ObjectDeleteView):
     queryset = NinjaTemplate.objects.all()
-
-
-@register_model_view(NinjaTemplate, "changelog", kwargs={"model": NinjaTemplate})
-class NinjaTemplateChangeLogView(ObjectChangeLogView):
-    base_template = "ninja_template.html"
 
 
 def _register_ninja_tab_view(netbox_model):
@@ -91,7 +85,7 @@ def _register_ninja_tab_view(netbox_model):
 
             return render(
                 request,
-                "ninja_tab.html",
+                "netbox_ninja_plugin/ninja_tab.html",
                 {
                     "object": target_object,
                     "ninja_templates": ninja_templates,

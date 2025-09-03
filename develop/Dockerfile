@@ -11,11 +11,10 @@ RUN set -x \
     && mv -fv /opt/netbox-${NETBOX_VERSION} /opt/netbox \
     && chown -cR netbox:root /opt/netbox/netbox/media
 
-COPY develop/base_requirements.txt /opt/netbox/
 RUN set -x \
     && cd /opt \
     && pip install --no-cache-dir --upgrade pip wheel \
-    && pip install --no-cache-dir poetry -r netbox/base_requirements.txt
+    && pip install --no-cache-dir poetry -r netbox/requirements.txt
 
 WORKDIR /opt/netbox_ninja_plugin
 

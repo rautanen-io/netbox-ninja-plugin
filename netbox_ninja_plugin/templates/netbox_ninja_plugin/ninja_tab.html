@@ -45,6 +45,10 @@
                     <td>
                         {% if ninja_template.output_type == 'drawio' %}
                         <div id="mxgraphContainer{{ forloop.counter0 }}"></div>
+                        {% elif ninja_template.output_type == 'html' %}
+                        {% autoescape off %}
+                        {% render_object ninja_template target_object=object %}
+                        {% endautoescape %}
                         {% else %}
                         <pre>{% render_object ninja_template target_object=object %}</pre>
                         {% endif %}

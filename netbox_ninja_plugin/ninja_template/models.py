@@ -86,6 +86,7 @@ class NinjaTemplate(NinjaTemplateMixin, NetBoxModel):
                     json.loads(output)
                 except (json.JSONDecodeError, TypeError) as err:
                     return f"JSON validation error: {err}", False
+            # validate html ?
 
             output = output.replace("\r\n", "\n")
             if self.output_type == NinjaTemplateOutputTypeChoices.DRAW_IO:

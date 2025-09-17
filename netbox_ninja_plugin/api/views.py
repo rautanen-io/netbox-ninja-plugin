@@ -75,5 +75,7 @@ class NinjaRenderView(APIView):
             http_content_type = "application/json"
         elif ninja_template.output_type == NinjaTemplateOutputTypeChoices.DRAW_IO:
             http_content_type = "image/svg+xml"
+        elif ninja_template.output_type == NinjaTemplateOutputTypeChoices.HTML:
+            http_content_type = "text/html"
 
         return HttpResponse(data, http_content_type, 200 if status else 400)

@@ -61,6 +61,10 @@
         <div class="card-body p-0 pt-0 overflow-auto">
             {% if object.output_type == 'drawio' %}
             <div id="mxgraphContainer0"></div>
+            {% elif object.output_type == 'html' %}
+            {% autoescape off %}
+            {% render_object object target_object=object %}
+            {% endautoescape %}
             {% else %}
             <pre>{% render_object object target_object=object %}</pre>
             {% endif %}

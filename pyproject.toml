@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "netbox-ninja-plugin"
-version = "0.1.12"
+version = "0.1.13"
 description = "Dynamic configuration files and images from NetBox."
 authors = ["Veikko Pankakoski <veikko@rautanen.io>", "Jaakko Rautanen <jaakko@rautanen.io>"]
 license = "MIT"

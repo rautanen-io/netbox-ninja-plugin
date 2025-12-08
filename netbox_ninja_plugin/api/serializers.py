@@ -1,5 +1,5 @@
+from core.api.serializers import ObjectTypeSerializer
 from core.models import ObjectType
-from extras.api.serializers import ObjectTypeSerializer
 from netbox.api.fields import SerializedPKRelatedField
 from netbox.api.serializers import NetBoxModelSerializer
 from rest_framework.serializers import HyperlinkedIdentityField

@@ -26,6 +26,6 @@ RUN set -x \
 
 WORKDIR /opt/netbox/netbox
 
-COPY develop/configuration.py /opt/netbox/netbox/netbox/
+COPY develop/configuration.py /opt/netbox/netbox/netbox/configuration.py
 
 RUN set -x && python manage.py collectstatic --no-input

@@ -56,13 +56,14 @@ Netbox Ninja Plugin can be used to generate **always up-to-date** outputs for ma
 
 Plugin versions listed below have been tested with its corresponding NetBox version.
 
-| NetBox Version   | Plugin Version |
-|:----------------:|:--------------:|
-|  4.4.0 - 4.4.7   |     0.1.13     |
-|  4.2.3 - 4.3.7   |     0.1.12     |
-|  4.2.3 - 4.3.7   |     0.1.11     |
-|  4.2.3 - 4.3.6   |     0.1.10     |
-|  4.0.11 - 4.3.2  |     0.1.9      |
+| NetBox Version   | Plugin Version | draw.io / diagrams.net version |
+|:----------------:|:--------------:|:-------------------------------:
+|  4.4.0 - 4.4.10  |     0.1.14     |            29.5.2              |
+|  4.4.0 - 4.4.7   |     0.1.13     |            27.1.0              |
+|  4.2.3 - 4.3.7   |     0.1.12     |            27.1.0              |
+|  4.2.3 - 4.3.7   |     0.1.11     |            27.1.0              |
+|  4.2.3 - 4.3.6   |     0.1.10     |            27.1.0              |
+|  4.0.11 - 4.3.2  |     0.1.9      |            27.1.0              |
 
 
 ## Test Ninja in Codespaces

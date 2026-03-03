@@ -7,6 +7,9 @@
       "VARIANT": "3.11"
     }
   },
+  "containerEnv": {
+    "DOCKER_API_VERSION": "1.43"
+  },
   "customizations": {
     "vscode": {
       "settings": {},
@@ -16,7 +19,7 @@
     }
   },
   "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1.8.0": {},
     "ghcr.io/guiyomh/features/vim:0": {},
     "ghcr.io/jungaretti/features/make:1": {}
   },

@@ -22,8 +22,8 @@ services:
       - '8000:8000'
     volumes:
       - ${PWD}/:/opt/netbox_ninja_plugin
-      - ${PWD}/develop/configuration.py:/opt/netbox/netbox/netbox/configuration.py
-      - ${PWD}/develop/manage.py:/opt/netbox/netbox/manage.py
+      - ./configuration.py:/opt/netbox/netbox/netbox/configuration.py
+      - ./manage.py:/opt/netbox/manage.py
     env_file: ${PWD}/develop/dev.env
     tty: true
     build: &build
@@ -47,7 +47,7 @@ services:
       - python manage.py rqworker
     volumes:
       - ${PWD}/:/opt/netbox_ninja_plugin
-      - ${PWD}/develop//configuration.py:/opt/netbox/netbox/netbox/configuration.py
+      - ./configuration.py:/opt/netbox/netbox/netbox/configuration.py
     env_file: ${PWD}/develop/dev.env
     tty: true
     build:
@@ -58,7 +58,7 @@ services:
     image: postgres:16
     profiles:
     - netbox
-    env_file: dev.env
+    env_file: ${PWD}/develop/dev.env
     command: -c fsync=off
     volumes:
       - netbox-ninja-plugin:/var/lib/postgresql/data

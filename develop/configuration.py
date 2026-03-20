@@ -33,7 +33,7 @@ PLUGINS_CONFIG = {
             "verify_tls": True,
             "timeout": 60,
         },
-        "top_level_menu": False,
+        "top_level_menu": True,
     }
 }
 

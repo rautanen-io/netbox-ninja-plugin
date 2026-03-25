@@ -1,0 +1,19 @@
+{% comment %}
+Ninja template dropdown filter button only.
+
+Expects `ninja_template` with:
+- pk
+- filter_var_defs
+- active_filter_count
+- has_active_filters
+{% endcomment %}
+
+{% if ninja_template.filter_var_defs %}
+<button class="btn btn-sm {% if ninja_template.has_active_filters %}btn-secondary{% else %}btn-outline-secondary{% endif %}"
+    type="button" data-bs-toggle="collapse"
+    data-bs-target="#filters-{{ ninja_template.pk }}"
+    aria-expanded="{% if ninja_template.has_active_filters %}true{% else %}false{% endif %}"
+    aria-controls="filters-{{ ninja_template.pk }}">
+    Filters{% if ninja_template.active_filter_count %} ({{ ninja_template.active_filter_count }}){% endif %}
+</button>
+{% endif %}

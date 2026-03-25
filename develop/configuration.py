@@ -21,6 +21,7 @@ PLUGINS_CONFIG = {
             "dcim": ["device", "interface", "site", "region"],
             "ipam": ["prefix"],
         },
+        "filter_variable_prefix": "filter_",
         "jinja_model_querysets": {
             "dcim": ["device", "interface", "site", "region", "cable"],
             "ipam": ["prefix"],

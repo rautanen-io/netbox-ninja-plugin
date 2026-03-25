@@ -35,7 +35,9 @@ docker cp "${filename}" ${POSTGRES_CONTAINER}:/tmp/netbox.Z
 set +e
 cat <<EOF | docker exec --interactive ${POSTGRES_CONTAINER} sh
 su postgres
-pg_restore -c -d netbox -U ${POSTGRES_USER} /tmp/netbox.Z
+dropdb --if-exists -U netbox netbox
+createdb -U netbox netbox
+pg_restore -d netbox -U ${POSTGRES_USER} /tmp/netbox.Z
 EOF
 set -e
 

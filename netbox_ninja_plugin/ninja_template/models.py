@@ -4,7 +4,15 @@ import json
 import logging
 from typing import Any, Optional, Tuple, Union
 
-from django.db.models import CharField, ManyToManyField, TextField
+from django.core.validators import RegexValidator
+from django.db.models import (
+    CASCADE,
+    CharField,
+    ForeignKey,
+    ManyToManyField,
+    TextField,
+    UniqueConstraint,
+)
 from django.urls import reverse
 from django.utils.safestring import SafeString, mark_safe
 from jinja2 import TemplateError, TemplateSyntaxError, UndefinedError
@@ -43,6 +51,22 @@ class NinjaTemplate(NinjaTemplateMixin, NetBoxModel):
         related_name="ninja_templates",
         blank=True,
         help_text=("The object type(s) to which this template applies."),
+    )
+
+    object_type_filters = ManyToManyField(
+        to="core.ObjectType",
+        related_name="object_type_filters",
+        blank=True,
+        help_text=(
+            "For each Ninja tab, add dropdown filters based on the object types selected here."
+        ),
+    )
+
+    string_filters = ManyToManyField(
+        to="netbox_ninja_plugin.NinjaTemplateStringFilter",
+        related_name="ninja_templates",
+        blank=True,
+        help_text=("String-based filters available for this Ninja template."),
     )
 
     code = TextField(blank=True)
@@ -146,3 +170,71 @@ class NinjaTemplate(NinjaTemplateMixin, NetBoxModel):
         ordering = ["name"]
         verbose_name = "ninja template"
         verbose_name_plural = "ninja templates"
+
+
+class NinjaTemplateStringFilter(NetBoxModel):
+    name: CharField[str] = CharField(
+        max_length=64,
+    )
+    key: CharField[str] = CharField(
+        unique=True,
+        max_length=64,
+        validators=[
+            RegexValidator(
+                regex=r"^[A-Za-z0-9]+$",
+                message="Key must contain only alphanumeric characters (A-Z, a-z, 0-9).",
+            )
+        ],
+        help_text=(
+            "Machine-readable key used when referencing this string filter. "
+            "Only alphanumeric characters are allowed."
+        ),
+    )
+
+    def __str__(self) -> str:
+        return self.name
+
+    def get_absolute_url(self) -> str:
+        return reverse(
+            "plugins:netbox_ninja_plugin:ninjatemplatestringfilter", args=[self.pk]
+        )
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "ninja template string filter"
+        verbose_name_plural = "ninja template string filters"
+
+
+class NinjaTemplateStringFilterOption(NetBoxModel):
+    string_filter = ForeignKey(
+        to="netbox_ninja_plugin.NinjaTemplateStringFilter",
+        related_name="options",
+        on_delete=CASCADE,
+    )
+    value: CharField[str] = CharField(
+        max_length=255,
+    )
+    label: CharField[str] = CharField(
+        max_length=255,
+        blank=True,
+    )
+
+    def __str__(self) -> str:
+        return self.label or self.value
+
+    def get_absolute_url(self) -> str:
+        return reverse(
+            "plugins:netbox_ninja_plugin:ninjatemplatestringfilteroption",
+            args=[self.pk],
+        )
+
+    class Meta:
+        ordering = ["string_filter__name", "value"]
+        verbose_name = "ninja template string filter option"
+        verbose_name_plural = "ninja template string filter options"
+        constraints = [
+            UniqueConstraint(
+                fields=["string_filter", "value"],
+                name="unique_string_filter_option_value",
+            )
+        ]

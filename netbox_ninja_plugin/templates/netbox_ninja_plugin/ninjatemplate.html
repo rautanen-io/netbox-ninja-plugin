@@ -3,7 +3,9 @@
 {% load static %}
 
 {% block content %}
-<div class="col col-md-6">
+{% if 0 %}
+<div class="row">
+    <div class="col col-md-6">
     <div class="card">
         <h5 class="card-header d-flex justify-content-between">
             <span>Ninja Template</span>
@@ -36,41 +38,70 @@
             </tr>
             {% empty %}
             <tr>
-                <td>---</td>
+                <td><span class="text-muted">No object types assigned</span></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="card">
+        <h5 class="card-header d-flex justify-content-between">
+            <span>Object Type Filters</span>
+        </h5>
+        <table class="table table-hover attr-table">
+            {% for object_type in object.object_type_filters.all %}
+            <tr>
+                <td style="min-width:42px;">
+                    {{ object_type }}</br>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td><span class="text-muted">No object type filters assigned</span></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="card">
+        <h5 class="card-header d-flex justify-content-between">
+            <span>String Filters</span>
+        </h5>
+        <table class="table table-hover attr-table">
+            {% for string_filter in object.string_filters.all %}
+            <tr>
+                <td style="min-width:42px;">
+                    {{ string_filter }}</br>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td><span class="text-muted">No string filters assigned</span></td>
             </tr>
             {% endfor %}
         </table>
     </div>
 </div>
-<div class="col col-md-12">
-    <div class="card">
-        <h5 class="card-header d-flex justify-content-between">
-            <span>Code</span>
-        </h5>
-        <div class="card-body p-0 pt-0 overflow-auto">
-            <pre class="p-0 pt-0"><code class="language-jinja">{{ object.code }}</code></pre>
-        </div>
-    </div>
-</div>
+    <div class="col col-md-6">
 {% if not object.object_types.all.count %}
 <div class="col col-md-12">
     <div class="card">
         <h5 class="card-header d-flex justify-content-between">
             <span>Rendered</span>
+            {% include "netbox_ninja_plugin/_ninja_template_filters_button.html" with ninja_template=ninja_template_card %}
         </h5>
         <div class="card-body p-0 pt-0 overflow-auto">
+            {% include "netbox_ninja_plugin/_ninja_template_filters_collapse.html" with ninja_template=ninja_template_card reset_action_url=object.get_absolute_url %}
             {% if object.output_type == 'drawio' %}
             <div id="mxgraphContainer0"></div>
             {% else %}
-            <pre>{% render_object object target_object=object %}</pre>
+            <pre>{% render_object object target_object=object filters=ninja_template_card.filter_values %}</pre>
             {% endif %}
         </div>
     </div>
     <span>View in <a href="{% url 'plugins-api:netbox_ninja_plugin-api:ninjatemplate-render' pk=object.pk %}?app={{ object|app_label }}&model={{ object|model_name }}&pk={{ object.pk }}">API</a>.</span>
 </div>
-    {% with ninja_templates=object|as_list %}
+    {% with ninja_templates=ninja_template_card|as_list %}
         {% if object.output_type == 'drawio' %}
-            {% include "netbox_ninja_plugin/_drawio_script.html" %}
+            {% include "netbox_ninja_plugin/_drawio_script.html" with return_url_base=object.get_absolute_url %}
         {% endif %}
     {% endwith %}
 {% else %}
@@ -85,4 +116,138 @@
     </div>
 </div>
 {% endif %}
+        <div class="card mt-3">
+            <h5 class="card-header d-flex justify-content-between">
+                <span>Code</span>
+            </h5>
+            <div class="card-body p-0 pt-0 overflow-auto">
+                <pre class="p-0 pt-0"><code class="language-jinja">{{ object.code }}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="col col-md-12">
+    {% if not object.object_types.all.count %}
+    <div class="card">
+        <h5 class="card-header d-flex justify-content-between">
+            <span>Rendered</span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-muted small">Output:</span>
+                {% badge object.output_type bg_color=object.get_output_type_color %}
+                <a class="btn btn-sm btn-outline-primary"
+                    href="{% url 'plugins-api:netbox_ninja_plugin-api:ninjatemplate-render' pk=object.pk %}?app={{ object|app_label }}&model={{ object|model_name }}&pk={{ object.pk }}">API</a>
+                {% include "netbox_ninja_plugin/_ninja_template_filters_button.html" with ninja_template=ninja_template_card %}
+            </div>
+        </h5>
+        <div class="card-body p-0 pt-0 overflow-auto">
+            {% include "netbox_ninja_plugin/_ninja_template_filters_collapse.html" with ninja_template=ninja_template_card reset_action_url=object.get_absolute_url %}
+            {% if object.output_type == 'drawio' %}
+            <div id="mxgraphContainer0"></div>
+            {% else %}
+            <pre>{% render_object object target_object=object filters=ninja_template_card.filter_values %}</pre>
+            {% endif %}
+        </div>
+    </div>
+
+    {% with ninja_templates=ninja_template_card|as_list %}
+        {% if object.output_type == 'drawio' %}
+            {% include "netbox_ninja_plugin/_drawio_script.html" with return_url_base=object.get_absolute_url %}
+        {% endif %}
+    {% endwith %}
+    {% else %}
+    <div class="card">
+        <h5 class="card-header d-flex justify-content-between">
+            <span>Rendered</span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-muted small">Output:</span>
+                {% badge object.output_type bg_color=object.get_output_type_color %}
+                <a class="btn btn-sm btn-outline-primary"
+                    href="{% url 'plugins-api:netbox_ninja_plugin-api:ninjatemplate-render' pk=object.pk %}?app={{ object|app_label }}&model={{ object|model_name }}&pk={{ object.pk }}">API</a>
+            </div>
+        </h5>
+        <div class="card-body">
+            <span class="text-muted">See target objects to view rendered template when object types are set.</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card mt-3">
+        <h5 class="card-header d-flex justify-content-between align-items-center">
+            <span>Code</span>
+            <button class="btn btn-sm btn-outline-secondary" type="button"
+                data-bs-toggle="collapse" data-bs-target="#ninjatemplate-code-collapse"
+                aria-expanded="true" aria-controls="ninjatemplate-code-collapse">
+                Hide
+            </button>
+        </h5>
+        <div id="ninjatemplate-code-collapse" class="card-body p-0 pt-0 overflow-auto collapse show">
+            <pre class="p-0 pt-0"><code class="language-jinja">{{ object.code }}</code></pre>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col col-md-6">
+        {% include 'inc/panels/tags.html' %}
+
+        <div class="card mt-3">
+            <h5 class="card-header d-flex justify-content-between">
+                <span>Object Types</span>
+            </h5>
+            <table class="table table-hover attr-table">
+                {% for object_type in object.object_types.all %}
+                <tr>
+                    <td style="min-width:42px;">
+                        {{ object_type }}</br>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td><span class="text-muted">No object types assigned</span></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <div class="col col-md-6">
+        <div class="card">
+            <h5 class="card-header d-flex justify-content-between">
+                <span>Object Type Filters</span>
+            </h5>
+            <table class="table table-hover attr-table">
+                {% for object_type in object.object_type_filters.all %}
+                <tr>
+                    <td style="min-width:42px;">
+                        {{ object_type }}</br>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td><span class="text-muted">No object type filters assigned</span></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="card mt-3">
+            <h5 class="card-header d-flex justify-content-between">
+                <span>String Filters</span>
+            </h5>
+            <table class="table table-hover attr-table">
+                {% for string_filter in object.string_filters.all %}
+                <tr>
+                    <td style="min-width:42px;">
+                        {{ string_filter }}</br>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td><span class="text-muted">No string filters assigned</span></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

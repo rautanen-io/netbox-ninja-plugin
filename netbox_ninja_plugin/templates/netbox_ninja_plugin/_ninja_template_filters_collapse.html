@@ -1,0 +1,60 @@
+{% comment %}
+Ninja template dropdown filter collapse body only.
+
+Expects `ninja_template` with:
+- pk
+- filter_var_defs
+- own_filter_query_keys
+- has_active_filters
+- filter_form
+
+Also expects:
+- `request` in template context
+- `reset_action_url` in template context
+{% endcomment %}
+
+{% if ninja_template.filter_var_defs %}
+<div id="filters-{{ ninja_template.pk }}"
+    class="collapse{% if ninja_template.has_active_filters %} show{% endif %} border-top mt-2">
+    <form method="get" class="card-body">
+        {% for key, values in request.GET.lists %}
+            {% if key not in ninja_template.own_filter_query_keys %}
+                {% for value in values %}
+        <input type="hidden" name="{{ key }}" value="{{ value }}">
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        <div class="row g-3">
+            {% for field in ninja_template.filter_form %}
+            <div class="col-12 col-md-6 col-xl-4">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% for error in field.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-primary">Apply filters</button>
+            <button type="submit" class="btn btn-outline-secondary"
+                form="reset-filters-{{ ninja_template.pk }}">Reset</button>
+        </div>
+    </form>
+
+    <form id="reset-filters-{{ ninja_template.pk }}" method="get"
+        action="{{ reset_action_url }}" class="d-none">
+        {# Preserve other filters query params while dropping only this template's filter keys. #}
+        {% for key, values in request.GET.lists %}
+            {% if key not in ninja_template.own_filter_query_keys %}
+                {% for value in values %}
+        <input type="hidden" name="{{ key }}" value="{{ value }}">
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    </form>
+</div>
+{% endif %}

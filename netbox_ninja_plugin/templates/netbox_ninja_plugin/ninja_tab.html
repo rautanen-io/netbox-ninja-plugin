@@ -5,57 +5,40 @@
 
 {% block content %}
 <div>
-    {% for ninja_template in ninja_templates.all %}
-    <div class="card">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th> Output type</th>
-                    <th>API</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ ninja_template|linkify:"name" }}</td>
-                    <td>{% badge ninja_template.output_type bg_color=ninja_template.get_output_type_color %}</td>
-                    <td> <a
-                            href="{% url 'plugins-api:netbox_ninja_plugin-api:ninjatemplate-render' pk=ninja_template.pk %}?app={{ object|app_label }}&model={{ object|model_name }}&pk={{ object.pk }}">Open</a>
-                    </td>
-                    <td class="text-end d-print-none">
-                        {% if perms.netbox_ninja_plugin.change_ninjatemplate %}
-                        <a href="{% url 'plugins:netbox_ninja_plugin:ninjatemplate_edit' pk=ninja_template.pk %}?return_url={{ object.get_absolute_url }}ninja/"
-                            class="btn btn-warning lh-1" title="Edit">
-                            <i class="mdi mdi-pencil" aria-hidden="true"></i>
-                        </a>
-                        {% endif %}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Rendered</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        {% if ninja_template.output_type == 'drawio' %}
-                        <div id="mxgraphContainer{{ forloop.counter0 }}"></div>
-                        {% else %}
-                        <pre>{% render_object ninja_template target_object=object %}</pre>
-                        {% endif %}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    {% for ninja_template in ninja_templates %}
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-start gap-3">
+            <div class="d-grid gap-1">
+                <div class="fw-semibold">{{ ninja_template.template|linkify:"name" }}</div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 ms-auto align-items-center d-print-none">
+                <span class="text-muted small">Output:</span>
+                {% badge ninja_template.output_type bg_color=ninja_template.get_output_type_color %}
+                <a class="btn btn-sm btn-outline-primary"
+                    href="{% url 'plugins-api:netbox_ninja_plugin-api:ninjatemplate-render' pk=ninja_template.pk %}?app={{ object|app_label }}&model={{ object|model_name }}&pk={{ object.pk }}">API</a>
+                {% include "netbox_ninja_plugin/_ninja_template_filters_button.html" with ninja_template=ninja_template %}
+                {% if perms.netbox_ninja_plugin.change_ninjatemplate %}
+                <a href="{% url 'plugins:netbox_ninja_plugin:ninjatemplate_edit' pk=ninja_template.pk %}?return_url={{ object.get_absolute_url }}ninja/"
+                    class="btn btn-sm btn-warning lh-1" title="Edit">
+                    <i class="mdi mdi-pencil" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% include "netbox_ninja_plugin/_ninja_template_filters_collapse.html" with ninja_template=ninja_template reset_action_url=object.get_absolute_url|add:"ninja/" %}
+
+        <div class="card-body border-top">
+            {% if ninja_template.output_type == 'drawio' %}
+            <div id="mxgraphContainer{{ forloop.counter0 }}"></div>
+            {% else %}
+            <pre class="mb-0">{% render_object ninja_template.template target_object=object filters=ninja_template.filter_values %}</pre>
+            {% endif %}
+        </div>
     </div>
     {% endfor %}
 </div>
-{% if ninja_templates.all|any_drawio %}
+{% if ninja_templates|any_drawio %}
     {% include "netbox_ninja_plugin/_drawio_script.html" %}
 {% endif %}
 {% endblock %}

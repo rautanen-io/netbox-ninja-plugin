@@ -50,6 +50,7 @@ Netbox Ninja Plugin can be used to generate **always up-to-date** outputs for ma
 - Support for object-specific template rendering
   - Show output in Ninja tab in chosen Netbox object view (i.e. Site)
   - Tempalate rendered per object (i.e for each Site)
+- Per-template dropdown filters on Ninja tab templates (object type + string filters)
 
 ## Requirements
 
@@ -62,6 +63,7 @@ Plugin versions listed below have been tested with its corresponding NetBox vers
 
 | NetBox Version   | Plugin Version | draw.io / diagrams.net version |
 |:----------------:|:--------------:|:-------------------------------:
+|  4.4.0 - 4.4.10  |     0.1.15     |            29.5.2              |
 |  4.4.0 - 4.4.10  |     0.1.14     |            29.5.2              |
 |  4.4.0 - 4.4.7   |     0.1.13     |            27.1.0              |
 |  4.2.3 - 4.3.7   |     0.1.12     |            27.1.0              |
@@ -104,6 +106,7 @@ PLUGINS_CONFIG = {
             "dcim": ["device", "interface", "site", "region"],
             "ipam": ["prefix"],
         },
+        "filter_variable_prefix": "filter_",
         "drawio_export_api": {
             "enabled": True,
             "url": "https://drawio-export-api:443/svg",
@@ -126,12 +129,19 @@ PLUGINS_CONFIG = {
    - Name: Template identifier
    - Output type: Text or Draw.io format
    - Object types: NetBox objects to associate with the template
+   - Object type filters: Adds dropdown filters on the Ninja tab for templates (based on selected object types)
+   - String filters: Adds dropdowns on the Ninja tab for reusable string filter options
    - Template code: Your Jinja2 template
 
 ### Template Variables
 
 - Access NetBox objects using object queries, e.g. `{{ sites.first() }}` or `{{ regions.get(slug='region1') }}`
 - For object-specific templates, use `{{ target_object }}` to reference the current object
+- Ninja tab dropdown filter selections are exposed to templates as Jinja variables.
+  - Variable names use `filter_variable_prefix` (default: `filter_`), e.g. `{{ filter_sites }}`.
+  - Object type filter variables receive a queryset of the selected objects (or `None` when no selection is made).
+  - String filter variables receive a list of the selected option values (or `None` when nothing is selected).
+- Filter selections persist via query parameters while the page is open, and each template card has its own scoped reset.
 
 For detailed examples and use cases, see [EXAMPLES.md](EXAMPLES.md).
 

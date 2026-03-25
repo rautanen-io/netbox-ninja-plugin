@@ -26,6 +26,7 @@ class NinjaPluginConfig(PluginConfig):
             "dcim": ["device", "interface", "site", "region"],
             "ipam": ["prefix"],
         },
+        "filter_variable_prefix": "filter_",
         "jinja_model_querysets": {
             "dcim": ["device", "interface", "site", "region"],
             "ipam": ["prefix"],

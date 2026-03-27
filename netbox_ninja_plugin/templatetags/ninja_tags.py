@@ -5,7 +5,9 @@ register = template.Library()
 
 @register.simple_tag
 def render_object(obj, **context):
-    return obj.render(**context)[0]
+    filters = context.pop("filters", None) or {}
+    render_context = {**context, **filters}
+    return obj.render(**render_context)[0]
 
 
 @register.filter

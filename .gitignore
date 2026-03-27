@@ -26,6 +26,9 @@ poetry.lock
 # VSCode
 .vscode/
 
+# Cursor
+.cursor/
+
 # Pytest
 .cache
 *.cover

@@ -6,14 +6,32 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-from netbox_ninja_plugin.api.serializers import NinjaTemplateSerializer
+from netbox_ninja_plugin.api.serializers import (
+    NinjaTemplateSerializer,
+    NinjaTemplateStringFilterOptionSerializer,
+    NinjaTemplateStringFilterSerializer,
+)
 from netbox_ninja_plugin.ninja_template.choices import NinjaTemplateOutputTypeChoices
-from netbox_ninja_plugin.ninja_template.models import NinjaTemplate
+from netbox_ninja_plugin.ninja_template.models import (
+    NinjaTemplate,
+    NinjaTemplateStringFilter,
+    NinjaTemplateStringFilterOption,
+)
 
 
 class NinjaTemplateViewSet(NetBoxModelViewSet):
     queryset = NinjaTemplate.objects.all()
     serializer_class = NinjaTemplateSerializer
+
+
+class NinjaTemplateStringFilterViewSet(NetBoxModelViewSet):
+    queryset = NinjaTemplateStringFilter.objects.all()
+    serializer_class = NinjaTemplateStringFilterSerializer
+
+
+class NinjaTemplateStringFilterOptionViewSet(NetBoxModelViewSet):
+    queryset = NinjaTemplateStringFilterOption.objects.all()
+    serializer_class = NinjaTemplateStringFilterOptionSerializer
 
 
 class NinjaRenderView(APIView):
@@ -38,8 +56,13 @@ class NinjaRenderView(APIView):
             model_class = target_object_type.model_class()
             target_object_id = request.GET.get("pk")
             target_object = get_object_or_404(model_class, pk=target_object_id)
+        except ObjectType.DoesNotExist as exc:
+            raise Http404("Requested object type not found") from exc
+        except Http404:
+            # Preserve the original 404 semantics/messages from get_object_or_404.
+            raise
         except Exception as exc:
-            raise Http404("Requested object type or target object not found") from exc
+            raise Http404("Requested target object not found") from exc
 
         # Use standard permission codename and object-level check
         perm_codename = (
@@ -49,24 +72,24 @@ class NinjaRenderView(APIView):
             raise PermissionDenied("You do not have permission to view this object.")
 
         ninja_template = get_object_or_404(NinjaTemplate, pk=ninja_template_id)
-        ninja_template_object_types = ninja_template.object_types.all()
         ninja_template_object_type = ObjectType.objects.get_for_model(NinjaTemplate)
+        template_object_types_exist = ninja_template.object_types.exists()
 
         # Check that if the template doesn't have any object types, template
         # can only be rendered to a NinjaTemplate object type:
         unassigned_ninja_template = False
         if (
-            not ninja_template_object_types
+            not template_object_types_exist
             and target_object_type == ninja_template_object_type
             and str(target_object_id) == str(ninja_template_id)
         ):
             unassigned_ninja_template = True
 
         # Check that the selected template is applied to this object type:
-        if (
-            not unassigned_ninja_template
-            and target_object_type not in ninja_template_object_types
-        ):
+        is_applied_to_object_type = ninja_template.object_types.filter(
+            pk=target_object_type.pk
+        ).exists()
+        if not unassigned_ninja_template and not is_applied_to_object_type:
             raise Http404(f"Selected template is not applied to {target_object_type}.")
 
         data, status = ninja_template.render(**{"target_object": target_object})

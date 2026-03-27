@@ -19,6 +19,32 @@ _menu_items = (
             )
         ],
     ),
+    PluginMenuItem(
+        link="plugins:netbox_ninja_plugin:ninjatemplatestringfilter_list",
+        link_text="String Filters",
+        permissions=["netbox_ninja_plugin.view_ninjatemplatestringfilter"],
+        buttons=[
+            PluginMenuButton(
+                link="plugins:netbox_ninja_plugin:ninjatemplatestringfilter_add",
+                title="Add",
+                icon_class="mdi mdi-plus-thick",
+                permissions=["netbox_ninja_plugin.add_ninjatemplatestringfilter"],
+            )
+        ],
+    ),
+    # PluginMenuItem(
+    #     link="plugins:netbox_ninja_plugin:ninjatemplatestringfilteroption_list",
+    #     link_text="String Filter Options",
+    #     permissions=["netbox_ninja_plugin.view_ninjatemplatestringfilteroption"],
+    #     buttons=[
+    #         PluginMenuButton(
+    #             link="plugins:netbox_ninja_plugin:ninjatemplatestringfilteroption_add",
+    #             title="Add",
+    #             icon_class="mdi mdi-plus-thick",
+    #             permissions=["netbox_ninja_plugin.add_ninjatemplatestringfilteroption"],
+    #         )
+    #     ],
+    # ),
 )
 
 

@@ -19,6 +19,7 @@ PLUGINS_CONFIG = {
             "dcim": ["device", "interface", "site", "region"],
             "ipam": ["prefix"],
         },
+        "filter_variable_prefix": "filter_",
         "drawio_export_api": {
             "enabled": True,
             "url": "https://drawio-export-api:443/svg",
@@ -38,6 +39,7 @@ PLUGINS_CONFIG = {
 | :--- | :--- |
 | `target_models` | Specifies which Netbox class views will have the Ninja tab. This determines where the template output will be displayed in the NetBox interface. |
 | `jinja_model_querysets` | Defines which Netbox object types can be used in the Ninja templates. These are the models that can be queried using Jinja2 syntax in your templates. |
+| `filter_variable_prefix` | Prefix used for the Jinja variable names created from Ninja tab dropdown filter selections (default: `filter_`). Example: `filter_sites`. |
 | `drawio_export_api.url` | The URL for the [drawio-export-api](https://github.com/rautanen-io/drawio-export-api) service. This is required for SVG image generation. |
 | `drawio_export_api.enabled` | Boolean to enable or disable Draw.io Export API integration. |
 | `drawio_export_api.token` | Bearer token used to authenticate to the draw.io API. This should be kept secure and not exposed in version control. |
@@ -66,6 +68,7 @@ PLUGINS_CONFIG = {
         "jinja_model_querysets": {
             "dcim": ["device", "interface", "site", "region"],
         },
+        "filter_variable_prefix": "filter_",
         "drawio_export_api": {
             "enabled": True,
             "url": "http://localhost:8080/svg",
@@ -91,6 +94,7 @@ PLUGINS_CONFIG = {
             "dcim": ["device", "interface", "site", "region"],
             "ipam": ["prefix", "vrf", "vlan"],
         },
+        "filter_variable_prefix": "filter_",
         "drawio_export_api": {
             "enabled": True,
             "url": "https://drawio-export-api:443/svg",

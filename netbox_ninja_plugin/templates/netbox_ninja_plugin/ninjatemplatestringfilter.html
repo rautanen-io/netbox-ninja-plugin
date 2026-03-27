@@ -1,0 +1,61 @@
+{% extends 'generic/object.html' %}
+
+{% block content %}
+<div class="col col-md-6">
+    <div class="card">
+        <h5 class="card-header d-flex justify-content-between">
+            <span>String Filter</span>
+        </h5>
+        <table class="table table-hover attr-table">
+            <tr>
+                <td style="min-width:42px;">Name</td>
+                <td style="min-width:42px;">{{ object.name }}</td>
+            </tr>
+            <tr>
+                <td style="min-width:42px;">Key</td>
+                <td style="min-width:42px;"><code>{{ object.key }}</code></td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        {% include 'inc/panels/tags.html' %}
+    </div>
+</div>
+<div class="col col-md-6">
+    <div class="card">
+        <h5 class="card-header d-flex justify-content-between">
+            <span>Ninja Templates</span>
+        </h5>
+        <table class="table table-hover attr-table">
+            {% for ninja_template in object.ninja_templates.all %}
+            <tr>
+                <td style="min-width:42px;">
+                    <a href="{{ ninja_template.get_absolute_url }}">{{ ninja_template.name }}</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td><span class="text-muted">No ninja templates assigned</span></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="card">
+        <h5 class="card-header d-flex justify-content-between">
+            <span>Options</span>
+        </h5>
+        <table class="table table-hover attr-table">
+            {% for option in object.options.all %}
+            <tr>
+                <td style="min-width:42px;"><code>{{ option.value }}</code></td>
+                <td style="min-width:42px;">{{ option.label|default:"No label assigned" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td><span class="text-muted">No options assigned</span></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}

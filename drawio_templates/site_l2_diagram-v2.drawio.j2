@@ -46,7 +46,7 @@
 {#- 
     Misc.
 #}
-{%- set ns = namespace(column_data={},column_meta_data={},roles_for_columns=[]) %}
+{%- set ns = namespace(column_data={},column_meta_data={},roles_for_columns=[],filtered_column_devices={},filtered_names_for_columns=[]) %}
 {%- set role_symbols = {
         "Firewall": "shape_fw_style",
         "Distribution Switch": "shape_router_style",
@@ -130,21 +130,92 @@
 {#- 
     Drop columns without devices
 #}
-{%- for col in init_roles_for_columns if devices.filter(
-        role__name__in = col,
-        status = 'active',
-        site_id = target_object.pk) | length
-%}
-{%-     set _ = ns.roles_for_columns.append( col ) %}
+{%- set ns_filter = namespace(device_names=[]) %}
+{%- set selected_filter_devices = [] %}
+{%- if filter_devices is defined and filter_devices is not none %}
+{%-   set selected_filter_devices = filter_devices %}
+{%- endif %}
+
+{%- if selected_filter_devices is not none %}
+{%-   for device in selected_filter_devices %}
+{%-     if
+          device
+          and device.status == 'active'
+          and device.site_id == target_object.pk
+      -%}
+{%-       set _ = ns_filter.device_names.append(device.name) %}
+{%-     endif %}
+{%-   endfor %}
+{%- endif %}
+{%- set apply_connectivity_filter = ns_filter.device_names | length > 0 %}
+
+{#-
+    Build role-preserving, connectivity-filtered device names per column.
+    Last column is limited by filter_devices (when present), and previous
+    columns include only devices connected to devices in the next column.
+#}
+{%- set ns_tmp = namespace(next_col_device_names=[]) %}
+{%- for col_index in range(init_roles_for_columns | length - 1, -1, -1) %}
+{%-   set role_col = init_roles_for_columns[col_index] %}
+{%-   set role_devices = devices.filter(
+          role__name__in = role_col,
+          status = 'active',
+          site_id = target_object.pk
+      ) | sort(attribute='name')
+  %}
+{%-   set col_device_names = [] %}
+{%-   if not apply_connectivity_filter %}
+{%-     if col_index < (init_roles_for_columns | length - 1) %}
+{%-       for device in role_devices %}
+{%-         if device.name not in col_device_names %}
+{%-           set _ = col_device_names.append(device.name) %}
+{%-         endif %}
+{%-       endfor %}
+{%-     endif %}
+{%-   elif col_index == (init_roles_for_columns | length - 1) %}
+{%-     for device in role_devices %}
+{%-       if device.name in ns_filter.device_names %}
+{%-         set _ = col_device_names.append(device.name) %}
+{%-       endif %}
+{%-     endfor %}
+{%-   else %}
+{%-     for device in role_devices %}
+{%-       if ns_tmp.next_col_device_names | length %}
+{%-         for iface in interfaces.filter(
+                    device=device,
+                    cable__isnull=False
+                )
+        %}
+{%-           if
+                iface.link_peers[0]
+                and iface.link_peers[0].device
+                and iface.link_peers[0].device.site_id == target_object.pk
+                and iface.link_peers[0].device.status == 'active'
+                and iface.link_peers[0].device.name in ns_tmp.next_col_device_names
+                and device.name not in col_device_names
+            -%}
+{%-             set _ = col_device_names.append(device.name) %}
+{%-           endif %}
+{%-         endfor %}
+{%-       endif %}
+{%-     endfor %}
+{%-   endif %}
+{%-   set _ = ns.filtered_column_devices.update({'col-' + col_index|string: col_device_names}) %}
+{%-   set ns_tmp.next_col_device_names = col_device_names %}
+{%- endfor %}
+
+{%- for col in init_roles_for_columns %}
+{%-   set col_index = loop.index0 %}
+{%-   set filtered_names = ns.filtered_column_devices['col-' + col_index|string] %}
+{%-   if filtered_names | length %}
+{%-     set _ = ns.roles_for_columns.append(col) %}
+{%-     set _ = ns.filtered_names_for_columns.append(filtered_names) %}
+{%-   endif %}
 {#- 
     Loop columns (group of roles)
 #}
 {%- endfor %}
-{%- for col in ns.roles_for_columns if devices.filter(
-        role__name__in = col,
-        status = 'active',
-        site_id = target_object.pk) | length
-%}
+{%- for col in ns.roles_for_columns %}
 {%-   set _ = ns.column_data.update(
         {
             'col-' + loop.index0|string: {}  
@@ -166,7 +237,8 @@
 {%-   for device in devices.filter(
         role__name__in = col,
         status = 'active',
-        site_id = target_object.pk
+        site_id = target_object.pk,
+        name__in = ns.filtered_names_for_columns[ns2.grand_loop_index]
     ) | sort(attribute='role.name')
 %}
 {%-     set _ = ns.column_data['col-' + ns2.grand_loop_index|string].update(
@@ -196,6 +268,7 @@
             and iface.link_peers[0].device.site_id == target_object.pk
             and iface.link_peers[0].device.status == 'active'
             and iface.link_peers[0].device.role.name in ns.roles_for_columns[ns2.grand_loop_index - 1]
+            and iface.link_peers[0].device.name in ns.filtered_names_for_columns[ns2.grand_loop_index - 1]
 -%}
 {%-         set _ = ns.column_data['col-' + ns2.grand_loop_index|string][device.name]['interfaces'].update(
                 {
@@ -222,6 +295,7 @@
             and iface.link_peers[0].device.site_id == target_object.pk
             and iface.link_peers[0].device.status == 'active'
             and iface.link_peers[0].device.role.name in ns.roles_for_columns[ns2.grand_loop_index + 1]
+            and iface.link_peers[0].device.name in ns.filtered_names_for_columns[ns2.grand_loop_index + 1]
 -%}
 {%-         set ns3.downlinks = true %}
 {%-         set local_if_name = format_int_name(iface.name) %}
@@ -267,7 +341,12 @@
     )
 %}
 {#-   Following section saves max hostname length of the coliumn and count how many devices in column has downlinks #}
-{%-   set max_hostname_len = devices.filter( role__name__in=col, status='active', site_id=target_object.pk) | map(attribute='name') | map('length') | max %}
+{%-   set max_hostname_len = devices.filter(
+                            role__name__in=col,
+                            status='active',
+                            site_id=target_object.pk,
+                            name__in = ns.filtered_names_for_columns[ns2.grand_loop_index]
+                        ) | map(attribute='name') | map('length') | max %}
 {%-   set left_remote_int_width = ns2.max_left_remote_label_len * int_char_width + int_label_margin %}
 {%-   set left_local_int_width = ns2.max_left_local_label_len * int_char_width + int_label_margin %}
 {%-   set right_remote_int_width = ns2.max_right_remote_label_len * int_char_width + int_label_margin %}
@@ -276,7 +355,8 @@
 {%-     set next_col_max_hostname_len = devices.filter(
                                 role__name__in = ns.roles_for_columns[loop.index0 + 1],
                                 status = 'active',
-                                site_id = target_object.pk
+                                site_id = target_object.pk,
+                                name__in = ns.filtered_names_for_columns[loop.index0 + 1]
                             )
                             | map(attribute='name')
                             | map('length')

@@ -1,0 +1,10 @@
+{% comment %}
+Reusable dropdown filter UI for Ninja templates.
+
+This is a convenience wrapper that renders both:
+- the dropdown button
+- the collapsible filter form body
+{% endcomment %}
+
+{% include "netbox_ninja_plugin/_ninja_template_filters_button.html" with ninja_template=ninja_template %}
+{% include "netbox_ninja_plugin/_ninja_template_filters_collapse.html" with ninja_template=ninja_template reset_action_url=reset_action_url %}

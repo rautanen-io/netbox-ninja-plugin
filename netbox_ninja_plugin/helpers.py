@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import Dict, List, Type, cast
+from typing import Any, Dict, List, Type, cast
 
 from core.models import ObjectType
 from django.db.models import Model
@@ -40,6 +40,15 @@ def _get_jinja_model_querysets() -> Dict[str, List[str]]:
     )
 
 
+def get_filter_variable_prefix() -> str:
+    """Return the configured Jinja variable prefix for Ninja tab filters."""
+    return get_plugin_config(
+        "netbox_ninja_plugin",
+        "filter_variable_prefix",
+        default=config.default_settings["filter_variable_prefix"],
+    )
+
+
 def get_target_model_fully_qualified_names() -> List[str]:
     """Get a list of fully qualified model names (app_label.model_name) for target models.
 
@@ -54,13 +63,25 @@ def get_target_model_fully_qualified_names() -> List[str]:
     return classes
 
 
-def get_target_model_names() -> List[str]:
+def get_model_names() -> List[str]:
     """Get a list of model names for target models.
 
     Returns:
         List[str]: A list of model names.
     """
     data = _get_target_models()
+    return [item for sublist in data.values() for item in sublist]
+
+
+def get_jinja_model_names() -> List[str]:
+    """Get a list of model names for Jinja models.
+
+    The returned list is derived from the plugin setting ``jinja_model_querysets``.
+
+    Returns:
+        List[str]: A list of model names.
+    """
+    data = _get_jinja_model_querysets()
     return [item for sublist in data.values() for item in sublist]
 
 
@@ -73,11 +94,16 @@ def get_jinja_model_plural_names() -> List[str]:
     object_names: List[str] = []
     jinja_models = get_jinja_model_object_types()
     for model in jinja_models:
-        # pylint: disable=protected-access
-        object_names.append(
-            replace_whitespace_with_underscores(str(model._meta.verbose_name_plural))
-        )
+        object_names.append(_get_plural_var_suffix(model))
     return object_names
+
+
+def _get_plural_var_suffix(model_class: Type[Model]) -> str:
+    """Get snake_case plural suffix for a model's verbose plural name."""
+    # pylint: disable=protected-access
+    return replace_whitespace_with_underscores(
+        str(model_class._meta.verbose_name_plural)
+    )
 
 
 def _get_object_types(data: Dict[str, List[str]]) -> List[Type[Model]]:
@@ -134,3 +160,48 @@ def replace_whitespace_with_underscores(string: str) -> str:
         str: The string with whitespace replaced with underscores.
     """
     return re.sub(r"\s+", "_", string)
+
+
+def get_filter_variable_name(object_type: ObjectType) -> str:
+    """Return the Jinja/context variable name for a selected filter object type.
+
+    The variable name is derived from the model's ``verbose_name_plural`` and
+    converted to snake_case.
+    Example: "Device type" -> "device_types".
+    """
+    model_class = object_type.model_class()
+    if model_class is None:
+        # Fall back to the raw object type model identifier; better than crashing.
+        suffix = str(object_type.model).lower()
+        # Best-effort pluralization for the removed/invalid-model fallback.
+        if not suffix.endswith("s"):
+            suffix += "s"
+        return f"{get_filter_variable_prefix()}{suffix}"
+
+    return f"{get_filter_variable_prefix()}{_get_plural_var_suffix(model_class)}"
+
+
+def get_string_filter_variable_name(key: str) -> str:
+    """Return the Jinja/context variable name for a string filter key."""
+    prefix = get_filter_variable_prefix()
+    if key.startswith(prefix):
+        return key
+    return f"{prefix}{key}"
+
+
+def get_viewable_queryset_for_user(model_class: Type[Model], user: Any):
+    """Return a queryset of instances the user may view (NetBox object-level permissions).
+
+    Uses ``RestrictedQuerySet.restrict()`` when available so Ninja tab object filters
+    match list/detail access. Falls back to an unrestricted queryset only if the model
+    does not use NetBox's restricted manager (e.g. some third-party types).
+    """
+    qs = model_class.objects.all()
+    restrict = getattr(qs, "restrict", None)
+    if callable(restrict):
+        return restrict(user, "view")
+    logger.warning(
+        "Model %s has no restrict(); Ninja tab object filter queryset is unrestricted.",
+        model_class._meta.label_lower,
+    )
+    return qs

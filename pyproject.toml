@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "netbox-ninja-plugin"
-version = "0.1.15"
+version = "0.2.0"
 description = "Dynamic configuration files and images from NetBox."
 authors = ["Veikko Pankakoski <veikko@rautanen.io>", "Jaakko Rautanen <jaakko@rautanen.io>"]
 license = "MIT"
@@ -16,7 +16,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.11,<4.0"
+python = ">=3.12,<4.0"
 requests = "^2.32.2"
 lxml = ">=5.0,<7.0"
 

@@ -16,8 +16,8 @@ class NinjaPluginConfig(PluginConfig):
     verbose_name = "Netbox Ninja"
     description = "Dynamic configuration files and images from NetBox."
     version = __version__
-    min_version = "4.4.0"
-    max_version = "4.4.10"
+    min_version = "4.5.0"
+    max_version = "4.5.99"
     author = "rautanen.io"
     author_email = "veikko@rautanenyhtiot.fi"
     required_settings = []

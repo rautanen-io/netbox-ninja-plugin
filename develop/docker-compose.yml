@@ -17,6 +17,14 @@ services:
       - sh
       - -c
       - python manage.py migrate && python manage.py runserver 0.0.0.0:8000
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/login/').read()"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
     ports:
       - '3000:3000'
       - '8000:8000'
@@ -39,7 +47,8 @@ services:
     profiles:
     - netbox
     depends_on:
-      - netbox
+      netbox:
+        condition: service_healthy
     init: true
     command:
       - sh

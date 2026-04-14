@@ -11,14 +11,14 @@ jobs:
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-  
+
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
@@ -30,12 +30,12 @@ jobs:
             PR_VERSION=$(poetry version --short)
             echo "PR_VERSION=$PR_VERSION" >> $GITHUB_ENV
             echo "Current PR version: $PR_VERSION"
-   
+
       - name: Fetch version from main branch
         run: |
             git fetch origin main
             git checkout origin/main -- pyproject.toml
-            
+
             MAIN_VERSION=$(poetry version --short)
             echo "MAIN_VERSION=$MAIN_VERSION" >> $GITHUB_ENV
             echo "Main branch version: $MAIN_VERSION"

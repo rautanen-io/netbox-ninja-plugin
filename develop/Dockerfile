@@ -22,7 +22,7 @@ COPY .. /opt/netbox_ninja_plugin
 RUN set -x \
     && poetry config virtualenvs.create false \
     && poetry config virtualenvs.in-project false \
-    && poetry install --no-ansi --no-interaction
+    && poetry install --only main --no-ansi --no-interaction
 
 WORKDIR /opt/netbox/netbox
 

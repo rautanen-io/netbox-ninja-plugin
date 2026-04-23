@@ -32,7 +32,7 @@ autoflake = "^2.3.1"
 pre-commit = "^4.2.0"
 
 [tool.poetry.group.dev.dependencies]
-django = "5.1.8"
+django = "5.2.13"
 jinja2 = "3.1.6"
 django-taggit = "6.1.0"
 django-tables2 = "2.7.5"

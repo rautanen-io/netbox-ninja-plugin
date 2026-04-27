@@ -1,0 +1,45 @@
+{% load ninja_tags %}
+<script>
+    (function () {
+        const downloadLinks = [];
+
+        function sanitizeFilename(value) {
+            return (value || "output")
+                .toString()
+                .trim()
+                .replace(/[^a-z0-9._-]+/gi, "_")
+                .replace(/^_+|_+$/g, "")
+                || "output";
+        }
+
+        function extensionForOutputType(outputType) {
+            const extensionMap = {
+                drawio: "drawio",
+                json: "json"
+            };
+            return extensionMap[outputType] || "txt";
+        }
+
+        {% for template in ninja_templates %}
+        const outputType{{ forloop.counter0 }} = "{{ template.output_type|escapejs }}";
+        const outputContent{{ forloop.counter0 }} = "{% if template.output_type == 'drawio' %}{% autoescape off %}{% filter escapejs %}{% render_object template frontend=True target_object=object filters=template.filter_values %}{% endfilter %}{% endautoescape %}{% else %}{% autoescape off %}{% filter escapejs %}{% render_object template target_object=object filters=template.filter_values %}{% endfilter %}{% endautoescape %}{% endif %}";
+        const fileName{{ forloop.counter0 }} = sanitizeFilename("{{ template.name|escapejs }}") + "." + extensionForOutputType(outputType{{ forloop.counter0 }});
+        const blob{{ forloop.counter0 }} = new Blob([outputContent{{ forloop.counter0 }}], { type: "text/plain;charset=utf-8" });
+        const downloadUrl{{ forloop.counter0 }} = URL.createObjectURL(blob{{ forloop.counter0 }});
+        const downloadLink{{ forloop.counter0 }} = document.getElementById("outputDownload{{ forloop.counter0 }}");
+
+        if (downloadLink{{ forloop.counter0 }}) {
+            downloadLink{{ forloop.counter0 }}.href = downloadUrl{{ forloop.counter0 }};
+            downloadLink{{ forloop.counter0 }}.download = fileName{{ forloop.counter0 }};
+            downloadLink{{ forloop.counter0 }}.removeAttribute("aria-disabled");
+            downloadLinks.push(downloadUrl{{ forloop.counter0 }});
+        }
+        {% endfor %}
+
+        window.addEventListener("beforeunload", function () {
+            downloadLinks.forEach(function (url) {
+                URL.revokeObjectURL(url);
+            });
+        });
+    })();
+</script>

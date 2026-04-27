@@ -16,6 +16,13 @@
                 {% badge ninja_template.output_type bg_color=ninja_template.get_output_type_color %}
                 <a class="btn btn-sm btn-outline-primary"
                     href="{% url 'plugins-api:netbox_ninja_plugin-api:ninjatemplate-render' pk=ninja_template.pk %}?app={{ object|app_label }}&model={{ object|model_name }}&pk={{ object.pk }}">API</a>
+                <a id="outputDownload{{ forloop.counter0 }}"
+                    class="btn btn-sm btn-outline-secondary"
+                    href="#"
+                    download
+                    aria-disabled="true">
+                    Download
+                </a>
                 {% include "netbox_ninja_plugin/_ninja_template_filters_button.html" with ninja_template=ninja_template %}
                 {% if perms.netbox_ninja_plugin.change_ninjatemplate %}
                 <a href="{% url 'plugins:netbox_ninja_plugin:ninjatemplate_edit' pk=ninja_template.pk %}?return_url={{ object.get_absolute_url }}ninja/"
@@ -38,6 +45,7 @@
     </div>
     {% endfor %}
 </div>
+{% include "netbox_ninja_plugin/_ninja_template_download_script.html" %}
 {% if ninja_templates|any_drawio %}
     {% include "netbox_ninja_plugin/_drawio_script.html" %}
 {% endif %}

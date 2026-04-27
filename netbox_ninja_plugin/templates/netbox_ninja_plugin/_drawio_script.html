@@ -7,7 +7,7 @@
     {% if template.output_type == 'drawio' %}
     window.NINJA_CONFIGS.push({
         viewerScriptUrl: "{% static 'netbox_ninja_plugin/js/viewer-static.min.js' %}",
-        xmlData: `{% filter escapejs %}{% render_object template frontend=True target_object=object filters=template.filter_values %}{% endfilter %}`,
+        xmlData: "{% autoescape off %}{% filter escapejs %}{% render_object template frontend=True target_object=object filters=template.filter_values %}{% endfilter %}{% endautoescape %}",
         editUrl: "{% url 'plugins:netbox_ninja_plugin:ninjatemplate_edit' pk=template.pk %}?return_url={% if return_url_base %}{{ return_url_base }}{% else %}{{ object.get_absolute_url }}ninja/{% endif %}",
         mxgraphContainerId: "mxgraphContainer{{ forloop.counter0 }}"
     });

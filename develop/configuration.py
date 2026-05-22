@@ -5,9 +5,13 @@ Netbox configuration for local development environment
 import os
 import sys
 
-DEBUG = True
-DEVELOPER = True
+# Avoid staticfiles.W004 when project-static/docs is missing from the release tree.
+_netbox_base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.makedirs(os.path.join(_netbox_base_dir, "project-static", "docs"), exist_ok=True)
+
 TEST_MODE = len(sys.argv) > 1 and sys.argv[1] == "test"
+DEBUG = not TEST_MODE
+DEVELOPER = not TEST_MODE
 
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True

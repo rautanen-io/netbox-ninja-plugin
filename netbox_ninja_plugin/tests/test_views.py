@@ -3,7 +3,7 @@ from core.models import ObjectType
 from dcim.models import Site
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
-from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND
+from rest_framework.status import HTTP_200_OK, HTTP_302_FOUND, HTTP_404_NOT_FOUND
 from users.models import ObjectPermission, User
 
 from netbox_ninja_plugin.helpers import (
@@ -26,6 +26,28 @@ class TestNinjaTemplateViews(TestNinjaTemplateMixing):
     def test_ninja_template_list_view(self):
         response = self.get("ninjatemplate_list")
         self.assertEqual(response.status_code, HTTP_200_OK)
+
+    def test_ninja_template_list_view_has_bulk_delete_not_bulk_edit(self):
+        response = self.get("ninjatemplate_list")
+        self.assertContains(response, "Delete Selected")
+        self.assertNotContains(response, "Edit Selected")
+
+    def test_ninja_template_bulk_delete(self):
+        template = NinjaTemplate.objects.create(name="to-delete")
+        url = reverse("plugins:netbox_ninja_plugin:ninjatemplate_bulk_delete")
+        response = self.client.post(url, {"pk": [template.pk]})
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
+        response = self.client.post(
+            url,
+            {
+                "pk": [template.pk],
+                "_confirm": "",
+                "confirm": True,
+            },
+        )
+        self.assertEqual(response.status_code, HTTP_302_FOUND)
+        self.assertFalse(NinjaTemplate.objects.filter(pk=template.pk).exists())
 
     def test_ninja_template_view(self):
         template = NinjaTemplate.objects.create(name="test")
@@ -75,6 +97,35 @@ class TestNinjaTemplateViews(TestNinjaTemplateMixing):
         response = self.client.get(url)
         self.assertEqual(response.status_code, HTTP_200_OK)
         self.assertIn("Name of this object: site1", str(response.content))
+
+    def test_string_filter_list_view_has_bulk_delete_not_bulk_edit(self):
+        response = self.get("ninjatemplatestringfilter_list")
+        self.assertContains(response, "Delete Selected")
+        self.assertNotContains(response, "Edit Selected")
+
+    def test_string_filter_bulk_delete(self):
+        string_filter = NinjaTemplateStringFilter.objects.create(
+            name="to-delete",
+            key="todelete",
+        )
+        url = reverse(
+            "plugins:netbox_ninja_plugin:ninjatemplatestringfilter_bulk_delete"
+        )
+        response = self.client.post(url, {"pk": [string_filter.pk]})
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
+        response = self.client.post(
+            url,
+            {
+                "pk": [string_filter.pk],
+                "_confirm": "",
+                "confirm": True,
+            },
+        )
+        self.assertEqual(response.status_code, HTTP_302_FOUND)
+        self.assertFalse(
+            NinjaTemplateStringFilter.objects.filter(pk=string_filter.pk).exists()
+        )
 
     def test_string_filter_add_with_options(self):
         response = self.client.post(

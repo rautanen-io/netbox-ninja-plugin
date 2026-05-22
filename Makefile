@@ -1,4 +1,4 @@
-NETBOX_VERSION?=4.5.7
+NETBOX_VERSION?=4.6.1
 PYTHON_VERSION?=3.13
 
 COMPOSE_FILE=./develop/docker-compose.yml

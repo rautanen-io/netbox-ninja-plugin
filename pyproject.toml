@@ -16,7 +16,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.13,<4.0"
+python = ">=3.12,<4.0"
 requests = "2.32.2"
 lxml = "6.1.1"
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "netbox-ninja-plugin"
-version = "0.2.1"
+version = "0.3.0"
 description = "Dynamic configuration files and images from NetBox."
 authors = ["Veikko Pankakoski <veikko@rautanen.io>", "Jaakko Rautanen <jaakko@rautanen.io>"]
 license = "MIT"
@@ -17,26 +17,26 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.12,<4.0"
-requests = "^2.32.2"
-lxml = ">=5.0,<7.0"
+requests = "2.32.2"
+lxml = "6.1.1"
 
 [tool.poetry.group.debug.dependencies]
-debugpy = "^1.8"
+debugpy = "1.8.20"
 
 [tool.poetry.group.test.dependencies]
-pytest = "^8.3.5"
-black = "^25.1.0"
-isort = "^6.0.1"
-flake8 = "^7.2.0"
-autoflake = "^2.3.1"
-pre-commit = "^4.2.0"
+pytest = "9.0.3"
+black = "26.5.1"
+isort = "8.0.1"
+flake8 = "7.3.0"
+autoflake = "2.3.3"
+pre-commit = "4.6.0"
 
 [tool.poetry.group.dev.dependencies]
-django = "5.2.13"
+django = "6.0.4"
 jinja2 = "3.1.6"
 django-taggit = "6.1.0"
-django-tables2 = "2.7.5"
-djangorestframework = "3.16.0"
+django-tables2 = "2.8.0"
+djangorestframework = "3.17.1"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

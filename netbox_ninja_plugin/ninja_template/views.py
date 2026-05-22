@@ -8,7 +8,9 @@ from django.contrib import messages
 from django.db import models
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from netbox.object_actions import AddObject, BulkDelete, BulkExport
 from netbox.views.generic import (
+    BulkDeleteView,
     ObjectDeleteView,
     ObjectEditView,
     ObjectListView,
@@ -267,13 +269,16 @@ class NinjaTemplateView(ObjectView):
         }
 
 
+@register_model_view(NinjaTemplate, "list", path="", detail=False)
 class NinjaTemplateListView(ObjectListView):
     queryset = NinjaTemplate.objects.all()
     table = NinjaTemplateTable
     filterset = NinjaTemplateFilterSet
     filterset_form = NinjaTemplateFilterForm
+    actions = (AddObject, BulkExport, BulkDelete)
 
 
+@register_model_view(NinjaTemplate, "add", detail=False)
 @register_model_view(NinjaTemplate, "edit")
 class NinjaTemplateEditView(ObjectEditView):
     queryset = NinjaTemplate.objects.all()
@@ -285,18 +290,28 @@ class NinjaTemplateDeleteView(ObjectDeleteView):
     queryset = NinjaTemplate.objects.all()
 
 
+@register_model_view(NinjaTemplate, "bulk_delete", path="delete", detail=False)
+class NinjaTemplateBulkDeleteView(BulkDeleteView):
+    queryset = NinjaTemplate.objects.all()
+    filterset = NinjaTemplateFilterSet
+    table = NinjaTemplateTable
+
+
 @register_model_view(NinjaTemplateStringFilter)
 class NinjaTemplateStringFilterView(ObjectView):
     queryset = NinjaTemplateStringFilter.objects.all()
 
 
+@register_model_view(NinjaTemplateStringFilter, "list", path="", detail=False)
 class NinjaTemplateStringFilterListView(ObjectListView):
     queryset = NinjaTemplateStringFilter.objects.all()
     table = NinjaTemplateStringFilterTable
     filterset = NinjaTemplateStringFilterFilterSet
     filterset_form = NinjaTemplateStringFilterFilterForm
+    actions = (AddObject, BulkExport, BulkDelete)
 
 
+@register_model_view(NinjaTemplateStringFilter, "add", detail=False)
 @register_model_view(NinjaTemplateStringFilter, "edit")
 class NinjaTemplateStringFilterEditView(ObjectEditView):
     queryset = NinjaTemplateStringFilter.objects.all()
@@ -368,6 +383,15 @@ class NinjaTemplateStringFilterEditView(ObjectEditView):
 @register_model_view(NinjaTemplateStringFilter, "delete")
 class NinjaTemplateStringFilterDeleteView(ObjectDeleteView):
     queryset = NinjaTemplateStringFilter.objects.all()
+
+
+@register_model_view(
+    NinjaTemplateStringFilter, "bulk_delete", path="delete", detail=False
+)
+class NinjaTemplateStringFilterBulkDeleteView(BulkDeleteView):
+    queryset = NinjaTemplateStringFilter.objects.all()
+    filterset = NinjaTemplateStringFilterFilterSet
+    table = NinjaTemplateStringFilterTable
 
 
 @register_model_view(NinjaTemplateStringFilterOption)

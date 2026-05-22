@@ -57,15 +57,13 @@ class NinjaTemplateForm(NetBoxModelForm):
         required=False,
         label="Code",
         widget=Textarea(attrs={"cols": "40", "rows": "20"}),
-        help_text=(
-            f"""Supported querysets: {
+        help_text=(f"""Supported querysets: {
                 ', '.join([f'{{{{ {name} }}}}' for name in get_jinja_model_plural_names()])
             }.
             Use {{{{ target_object }}}} for the current NetBox object instance.
             Object Type and string filters are exposed as Jinja variables using the configured
             "filter_variable_prefix" (currently "{get_filter_variable_prefix()}", e.g.
-            {{{{ {get_filter_variable_prefix()}sites }}}})."""
-        ),
+            {{{{ {get_filter_variable_prefix()}sites }}}})."""),
     )
 
     fieldsets = [

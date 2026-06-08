@@ -63,6 +63,7 @@ Plugin versions listed below have been tested with its corresponding NetBox vers
 
 | NetBox Version   | Plugin Version | draw.io / diagrams.net version |
 |:----------------:|:--------------:|:-------------------------------:
+|  4.6.x           |     0.3.2      |            29.5.2              |
 |  4.6.x           |     0.3.1      |            29.5.2              |
 |  4.6.x           |     0.3.0      |            29.5.2              |
 |  4.5.x           |     0.2.1      |            29.5.2              |

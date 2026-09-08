@@ -1,4 +1,5 @@
 from importlib import metadata
+from typing import ClassVar
 
 from netbox.plugins import PluginConfig
 
@@ -16,12 +17,12 @@ class NinjaPluginConfig(PluginConfig):
     verbose_name = "Netbox Ninja"
     description = "Dynamic configuration files and images from NetBox."
     version = __version__
-    min_version = "4.6.0"
-    max_version = "4.6.99"
+    min_version = "4.7.0"
+    max_version = "4.7.99"
     author = "rautanen.io"
     author_email = "veikko@rautanenyhtiot.fi"
-    required_settings = []
-    default_settings = {
+    required_settings: ClassVar[list] = []
+    default_settings: ClassVar[dict] = {
         "target_models": {
             "dcim": ["device", "interface", "site", "region"],
             "ipam": ["prefix"],

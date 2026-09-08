@@ -54,7 +54,7 @@ Netbox Ninja Plugin can be used to generate **always up-to-date** outputs for ma
 
 ## Requirements
 
-- NetBox v4.0.11 - v4.6.x
+- NetBox v4.0.11 - v4.7.x
 - [drawio-export-api](https://github.com/rautanen-io/drawio-export-api) Docker container. Optional, required for SVG images that need to be fetched through REST API.
 
 ## Compatibility
@@ -63,6 +63,7 @@ Plugin versions listed below have been tested with its corresponding NetBox vers
 
 | NetBox Version   | Plugin Version | draw.io / diagrams.net version |
 |:----------------:|:--------------:|:-------------------------------:
+|  4.7.x           |     0.4.1      |            29.5.2              |
 |  4.7.x           |     0.4.0      |            29.5.2              |
 |  4.6.x           |     0.3.2      |            29.5.2              |
 |  4.6.x           |     0.3.1      |            29.5.2              |

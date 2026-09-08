@@ -9,6 +9,15 @@ function ninjaDarkMode() {
     return 'light';
 }
 
+// NetBox navbar-vertical is z-index 1030; GraphViewer defaults lightbox to 999.
+function bumpGraphViewerZIndex() {
+    if (typeof GraphViewer === 'undefined') {
+        return;
+    }
+    GraphViewer.prototype.lightboxZIndex = 2000;
+    GraphViewer.prototype.toolbarZIndex = 2000;
+}
+
 function updateMxGraphData(configs) {
     for (const config of configs) {
         const src = config.viewerScriptUrl;
@@ -40,6 +49,7 @@ function updateMxGraphData(configs) {
         const mxscript = document.createElement('script');
         mxscript.type = 'text/javascript';
         mxscript.src = src;
+        mxscript.addEventListener('load', bumpGraphViewerZIndex);
         mxgraphContainer.appendChild(mxscript);
     }
 }
